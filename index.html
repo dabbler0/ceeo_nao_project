@@ -38,8 +38,17 @@
                     }(log_div))
                   });
                 }
-              })
-              .append($("<div>").addClass("delete_button").text("delete").click(function() {
+              })).append($('<div>').addClass('init_hidden').attr('id', 'button_dialog').html('<div class="field_wrapper">Name: <input class="field" id="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" id="button_new_commands"></textarea></div>').append($('<button>').attr('id', "done").text('done').click(function() {
+              	new_button.text($('#button_new_name').val())
+              	new_button.attr('title', $('#button_new_commands').val());
+              	new_button.removeClass('dialogged');
+              	$('#button_dialog').hide();
+              })).append($('<button>').addClass('edit').addClass('field').text('E').click(function() {
+              	new_button.addClass('dialogged');
+              	setTimeout(function() {
+              		$('#button_dialog').show();
+              	}, 300);
+              })).append($("<button>").addClass("delete").addClass('field').text('D').click(function() {
                 new_button.remove();
                 buttons.splice(nindex, 1);
               })));
@@ -212,14 +221,6 @@
       	position:absolute;
         padding: 5px;
       }
-      div.header {
-      	font-weight:bold;
-      	text-align:center;
-      	font-size:20px;
-      	height:70px;
-      	border-bottom:1px solid black;
-      	vertical-align:middle;
-      }
       div.indented {
         padding-left:10px;
       }
@@ -233,6 +234,14 @@
       	right:9px;
       	width:30px;
       	height: 30px;
+      }
+      button.edit {
+      	transition: background 0.3s ease-in, height 0.3s ease-in;
+      }
+      button.dialogged {
+      	height:300px;
+      	color:'#FFF';
+      	overflow:auto;
       }
     </style>
   </head>
