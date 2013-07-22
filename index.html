@@ -117,8 +117,11 @@
       div.button:nth-of-type(odd) {
         background: #EEE;
       }
-      div.button:nth-of-type(even) {
+      div.button:nth-of-type(even), div.button:nth-of-type(odd):hover {
         background: #DDD;
+      }
+      div.button:nth-of-type(even):hover {
+      	background: #CCC;
       }
       div.button#root {
         background: #FFF;
@@ -193,7 +196,18 @@
         left:0;
         overflow:auto;
       }
+<<<<<<< HEAD
       div.console {
+=======
+      div.console#client {
+      	top:0;
+      	bottom:0;
+      	right:50%;
+      	left:0;
+      	position:absolute;
+      }
+      div.console#server {
+>>>>>>> bc645855417d589c452f9836ebdf129e2411723e
       	top:0;
       	bottom:0;
       	right:0;
@@ -203,6 +217,10 @@
       div.header {
       	font-weight:bold;
       	text-align:center;
+      	font-size:20px;
+      	height:70px;
+      	border-bottom:1px solid black;
+      	vertical-align:middle;
       }
       div.monospace {
       	font-family:monospace;
