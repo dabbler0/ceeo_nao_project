@@ -21,17 +21,19 @@
                 "commands": nbcmd.val()
               });
               root_button.after($("<div>").addClass("button").text(new_button_obj.name).attr("title", new_button_obj.commands).click(function() {
-              	$("#clientlog").html($("#clientlog").html() + '[' + new_button_obj.name + '] ' + new_button_obj.commands);
+              	$("#clientlog").append('[' + new_button_obj.name + '] ' + new_button_obj.commands);
                 interpretation = interpret(new_button_obj.commands);
                 for (var i = 0; i < interpretation.length; i += 1) {
                   $.ajax({
                     url: "http://130.64.94.79:8080/execute?" + interpretation[i], error: function(blah, blah2, err) {
                     	console.log(err);
-                    }, success: function(response) {
-                    	$("#serverlog").html($("#serverlog").html() + ['fail', 'success'][Number(Boolean(response))]);
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                      $("#serverlog").append(response.success ? "success" : "failure");
                     }
                   });
-                  $("#clientlog").html($("#clientlog").html() + '<br />');
+                  $("#clientlog").append('<br/>');
                 }
               }));
               root_button.removeClass("dialogged");
@@ -54,13 +56,18 @@
           for (var i = 0; i < lines.length; i += 1) {
             var index, key, srarray = [];
             srarray.push("command=" + encodeURIComponent(lines[i].slice(0, index = lines[i].indexOf(" "))));
-            params = lines[i].slice(index + 1).split(", ");
-            for (var x = 0; x < params.length; x += 1) {
-              key = params[x].slice(0, index = params[x].indexOf(" "));
-              value = encodeURIComponent(params[x].slice(index + 1));
-              srarray.push(key + "=" + value);
+            if (index === -1) {
+              rarray.push("command=" + encodeURIComponent(lines[i]));
             }
-            rarray.push(srarray.join("&"));
+            else {
+              params = lines[i].slice(index + 1).split(", ");
+              for (var x = 0; x < params.length; x += 1) {
+                key = params[x].slice(0, index = params[x].indexOf(" "));
+                value = encodeURIComponent(params[x].slice(index + 1));
+                srarray.push(key + "=" + value);
+              }
+              rarray.push(srarray.join("&"));
+            }
           }
           return rarray;
         }
