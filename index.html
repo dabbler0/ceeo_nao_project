@@ -14,6 +14,7 @@
               }
             }),
             button_list = $("div#button_list"),
+            log = $("div#log"),
             create_button = $("button#create").click(function() {
               var new_button_obj;
               buttons.push(new_button_obj = {
@@ -21,8 +22,9 @@
                 "commands": nbcmd.val()
               });
               root_button.after($("<div>").addClass("button").text(new_button_obj.name).attr("title", new_button_obj.commands).click(function() {
-              	$("#clientlog").append($('<div').addClass('log').text('[' + new_button_obj.name + '] ' + new_button_obj.commands));
                 interpretation = interpret(new_button_obj.commands);
+                log_div = $('<div>').addClass('log').text('[' + new_button_obj.name + '] ' + new_button_obj.commands);
+              	log.append(log_div);
                 for (var i = 0; i < interpretation.length; i += 1) {
                   $.ajax({
                     url: "http://130.64.94.79:8080/execute?" + interpretation[i], error: function(blah, blah2, err) {
@@ -30,7 +32,7 @@
                     },
                     dataType: "json",
                     success: function(response) {
-                      $("#serverlog").append($('<div').addClass('log').text(response.success ? "success" : "failure"));
+              	      log_div.append($('<div>').addClass('log').text(response.success ? "success" : "failure"));
                     }
                   });
                 }
@@ -78,8 +80,6 @@
         padding: 0px;
         background: #EEE;
         overflow:hidden;
-      }
-      * {
         font-family:'Lato', 'Verdana', 'Arial', sans-serif;
       }
       div.blockish {
@@ -193,42 +193,27 @@
         left:0;
         overflow:auto;
       }
-      div.console#client {
-      	top:0;
-      	bottom:0;
-      	right:50%;
-      	left:0;
-      	position:absolute;
-      	border-right:1px solid black;
-      }
-      div.console#server {
+      div.console {
       	top:0;
       	bottom:0;
       	right:0;
-      	left:50%;
+        left:0;
       	position:absolute;
-      	border-left:1px solid black;
       }
       div.header {
       	font-weight:bold;
       	text-align:center;
       }
       div.monospace {
-      	font-family:Courier New;
-      	font-size:80%;
+      	font-family:monospace;
+      	font-size:15px;
       }
     </style>
   </head>
   <body>
     <div class="blockish" id="big_wrapper">
       <div class="blockish" id="left_wrap">
-      	<div class="console" id="client">
-      		<div class="header">Client</div>
-      		<div class="monospace" id="clientlog"></div>
-      	</div>
-      	<div class="console" id="server">
-      		<div class="header">Server</div>
-      		<div class="monospace" id="serverlog"></div>
+          <div class="monospace" id="log"></div>
       	</div>
       </div>
       <div class="blockish" id="right_wrap">
