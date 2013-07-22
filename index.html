@@ -23,17 +23,19 @@
               });
               root_button.after($("<div>").addClass("button").text(new_button_obj.name).attr("title", new_button_obj.commands).click(function() {
                 interpretation = interpret(new_button_obj.commands);
-                log_div = $('<div>').addClass('log').text('[' + new_button_obj.name + '] ' + new_button_obj.commands);
-              	log.append(log_div);
                 for (var i = 0; i < interpretation.length; i += 1) {
+                  log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "] " + interpretation[i]);
+                  log.append(log_div);
                   $.ajax({
                     url: "http://130.64.94.79:8080/execute?" + interpretation[i], error: function(blah, blah2, err) {
-                    	console.log(err);
+                      console.log(err);
                     },
                     dataType: "json",
-                    success: function(response) {
-              	      log_div.append($('<div>').addClass('log').text(response.success ? "success" : "failure"));
-                    }
+                    success: (function(log_div) {
+                      return function(response) {
+              	        log_div.append($('<div>').addClass('indented').text(response.success ? "Success" : "Failure"));
+                      }
+                    }(log_div))
                   });
                 }
               }));
@@ -196,23 +198,13 @@
         left:0;
         overflow:auto;
       }
-<<<<<<< HEAD
       div.console {
-=======
-      div.console#client {
-      	top:0;
-      	bottom:0;
-      	right:50%;
-      	left:0;
-      	position:absolute;
-      }
-      div.console#server {
->>>>>>> bc645855417d589c452f9836ebdf129e2411723e
       	top:0;
       	bottom:0;
       	right:0;
         left:0;
       	position:absolute;
+        padding: 5px;
       }
       div.header {
       	font-weight:bold;
@@ -222,17 +214,20 @@
       	border-bottom:1px solid black;
       	vertical-align:middle;
       }
+      div.indented {
+        padding-left:10px;
+      }
       div.monospace {
       	font-family:monospace;
-      	font-size:15px;
+      	font-size:12px;
+        white-space: pre;
       }
     </style>
   </head>
   <body>
     <div class="blockish" id="big_wrapper">
       <div class="blockish" id="left_wrap">
-          <div class="monospace" id="log"></div>
-      	</div>
+        <div class="monospace" id="log"></div>
       </div>
       <div class="blockish" id="right_wrap">
         <div id="button_list">

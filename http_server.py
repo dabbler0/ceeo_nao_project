@@ -61,7 +61,7 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         walkproxy.walkInit()
 
         #Walk. Turn by "turn" radians, then move fowards by "forward", right by "right" meters.
-        walkproxy.walkTo(dvFloat(qwargs, "forward", 0), dVFloat(qwargs, "right", 0), dVFloat(qwargs, "turn", 0))
+        walkproxy.walkTo(dVFloat(qwargs, "forward", 0), dVFloat(qwargs, "right", 0), dVFloat(qwargs, "turn", 0))
         
         #Reply with success.
         reply["success"] = True
