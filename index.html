@@ -1,0 +1,214 @@
+<html>
+  <head>
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+      $(function()  {
+        var buttons = [],
+            root_expanded,
+            root_button = $("div#root").click(function() {
+              if (!root_expanded) {
+                root_button.addClass("dialogged");
+                setTimeout(function() {$("#root_dialog").show();}, 300);
+                root_expanded = true;
+              }
+            }),
+            button_list = $("div#button_list"),
+            create_button = $("button#create").click(function() {
+              var new_button_obj;
+              buttons.push(new_button_obj = {
+                "name": nbname.val(),
+                "commands": nbcmd.val()
+              });
+              root_button.after($("<div>").addClass("button").text(new_button_obj.name).attr("title", new_button_obj.commands).click(function() {
+                interpretation = interpret(new_button_obj.commands);
+                for (var i = 0; i < interpretation.length; i += 1) {
+                  $.ajax({
+                    url: "http://130.64.94.79:8080/execute?" + interpretation[i]
+                  });
+                }
+              }));
+              root_button.removeClass("dialogged");
+              $("#root_dialog").hide();
+              nbname.val(""); nbcmd.val("");
+              setTimeout(function() { root_expanded = false }, 0);
+            }),
+            cancel_button = $("button#cancel").click(function() {
+              root_button.removeClass("dialogged");
+              $("#root_dialog").hide();
+              nbname.val(""); nbcmd.val("");
+              setTimeout(function() { root_expanded = false }, 0);
+            }),
+            nbname = $("#new_button_name"),
+            nbcmd = $("#new_button_commands");
+
+        function interpret(commands) {
+          var lines = commands.split("\n"),
+              rarray = [];
+          for (var i = 0; i < lines.length; i += 1) {
+            var index, key, srarray = [];
+            srarray.push("command=" + encodeURIComponent(lines[i].slice(0, index = lines[i].indexOf(" "))));
+            if (index === -1) {
+              rarray.push("command=" + encodeURIComponent(lines[i]));
+            }
+            else {
+              params = lines[i].slice(index + 1).split(", ");
+              for (var x = 0; x < params.length; x += 1) {
+                key = params[x].slice(0, index = params[x].indexOf(" "));
+                value = encodeURIComponent(params[x].slice(index + 1));
+                srarray.push(key + "=" + value);
+              }
+              rarray.push(srarray.join("&"));
+            }
+          }
+          return rarray;
+        }
+      })
+    </script>
+    <style>
+      body, html {
+        margin: 0px;
+        padding: 0px;
+        background: #EEE;
+        overflow:hidden;
+      }
+      * {
+        font-family:'Lato', 'Verdana', 'Arial', sans-serif;
+      }
+      div.blockish {
+        position:absolute;
+      }
+      div.blockish#left_wrap {
+        left:0px;
+        top:0px;
+        bottom:0px;
+        right:50%;
+      }
+      div.blockish#right_wrap {
+        left:50%;
+        top:0px;
+        bottom:0px;
+        right:0px;
+        border-left:1px solid #888;
+        box-shadow: 1px 0px 1px #888 inset;
+      }
+      div#left_wrap {
+        background: #FFF;
+        font-family: monospace;
+      }
+      div.button {
+        height:50px;
+        line-height:50px;
+        cursor:pointer;
+        padding:10px;
+        font-size:20px;
+        border-bottom: 1px solid #888;
+        box-shadow: 1px 0px 1px #888 inset;
+        transition: background 0.3s ease-in, height 0.3s ease-in, color 0.3s ease-in;
+        color: #000;
+      }
+      div.button:nth-of-type(odd) {
+        background: #EEE;
+      }
+      div.button:nth-of-type(even) {
+        background: #DDD;
+      }
+      div.button#root {
+        background: #FFF;
+      }
+      div.button#root:hover {
+        color: #710001;
+      }
+      div.button#root.dialogged {
+        height:320px;
+        cursor:auto;
+        color: #000;
+        overflow: auto;
+      }
+      .init_hidden {
+        display:none;
+      }
+      input.field {
+        height:30px;
+        width:200px;
+        line-height:30px;
+        font-family:'Lato', 'Verdana', 'Arial', sans-serif;
+        font-size: 15px;
+        border: 1px solid #888;
+        transition: box-shadow 0.3s ease-in;
+        outline: none;
+      }
+      input.field:focus {
+        box-shadow: 0 0 2px #888 inset;
+      }
+      button.field {
+        background:#710001;
+        font-family:'Lato', 'Verdana', 'Arial', sans-serif;
+        color: #FFF;
+        font-size: 12px;
+        line-height: 20px;
+        text-transform: uppercase;
+        cursor:hand;
+        border: 1px solid #000;
+        transition: background 0.3s ease-in;
+      }
+      button.field:hover, button.field:focus {
+        background:#F00;
+      }
+      div#button_list {
+        left:0;
+        right:0;
+        top:70px;
+        bottom:0px;
+        transition: top 0.3s ease-in;
+      }
+      span.prompt {
+        width:50px;
+      }
+      div#root_dialog {
+        font-size:17px;
+      }
+      textarea.field {
+        border: 1px solid #888;
+        width: 100%;
+        height: 100px;
+        font-family: monospace;
+        outline: none;
+        resize: none;
+      }
+      div.blockish#big_wrapper {
+        top:0;
+        bottom:0;
+        right:0;
+        left:0;
+        overflow:auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="blockish" id="big_wrapper">
+      <div class="blockish" id="left_wrap">
+      </div>
+      <div class="blockish" id="right_wrap">
+        <div id="button_list">
+          <div class="button" id="root">
+            + Create a Button
+            <div class="init_hidden" id="root_dialog">
+              <div class="field_wrapper">
+                Name: <input class="field" id="new_button_name"/>
+              </div>
+              <div class="field_wrapper">
+                <div class="textarea_field_label">Commands:</div>
+                <textarea class="field" id="new_button_commands"></textarea>
+              </div>
+              <div class="field_wrapper">
+                <button class="field" id="create">create</button>
+                <button class="field" id="cancel">cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
