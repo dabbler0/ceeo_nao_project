@@ -23,7 +23,7 @@
               });
               root_button.after($("<div>").addClass("button").text(new_button_obj.name).attr("title", new_button_obj.commands).click(function() {
                 interpretation = interpret(new_button_obj.commands);
-                log_div = $('<div>').addClass('log').text('[' + new_button_obj.name + '] ' + new_button_obj.commands);
+                log_div = $('<div>').addClass('log').text('[' + new_button_obj.name + '] ' + new_button_obj.commands.replace('\n', '; '));
               	log.append(log_div);
                 for (var i = 0; i < interpretation.length; i += 1) {
                   $.ajax({
