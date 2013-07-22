@@ -21,7 +21,7 @@
                 "commands": nbcmd.val()
               });
               root_button.after($("<div>").addClass("button").text(new_button_obj.name).attr("title", new_button_obj.commands).click(function() {
-              	$("#clientlog").append('[' + new_button_obj.name + '] ' + new_button_obj.commands);
+              	$("#clientlog").append($('<div').addClass('log').text('[' + new_button_obj.name + '] ' + new_button_obj.commands));
                 interpretation = interpret(new_button_obj.commands);
                 for (var i = 0; i < interpretation.length; i += 1) {
                   $.ajax({
@@ -30,10 +30,9 @@
                     },
                     dataType: "json",
                     success: function(response) {
-                      $("#serverlog").append(response.success ? "success" : "failure");
+                      $("#serverlog").append($('<div').addClass('log').text(response.success ? "success" : "failure"));
                     }
                   });
-                  $("#clientlog").append('<br/>');
                 }
               }));
               root_button.removeClass("dialogged");

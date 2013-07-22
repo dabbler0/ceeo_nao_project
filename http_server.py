@@ -49,7 +49,7 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     
       if qwargs["command"] == 'say':
         #Say whatever the client wanted us to
-        tosay = qwargs["tosay"]
+        tosay = qwargs["text"]
         ttsproxy.post.say(tosay) #TODO maybe daemonize this, so as to respond more quickly.
         
         #Reply that we've said it.
