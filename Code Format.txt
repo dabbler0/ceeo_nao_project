@@ -1,0 +1,11 @@
+Code format:
+	separate program commands with a line break
+	robot command: "run" + command + parameters (name + value) separated by ", " ("run say text bears, speed .8")
+	add variable: "add var" + name + value (optional) ("add var pineapples 1")
+	set variable value: "set var" + name + value ("set var pineapples 2")
+	equals: "is"
+	greater than: "is more than"
+	less than: "is less than"
+	loop: "loop" + ("if" + parameter)(optional; if absent, assume run forever) ("loop if pineapples is 1")
+	if: "if" + parameters ("if (pineapples is more than 0 and pineapples is less than 3) or pineapples is 4")
+	if/loop: open with "[" after parameters then close with "]"
