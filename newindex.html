@@ -107,6 +107,9 @@
           }
           return rarray;
         }
+        $('button#clearconsole').click(function() {
+        	log.html('');
+        });
       })
     </script>
     <style>
@@ -151,24 +154,27 @@
         color: #000;
       }
       div.button:nth-of-type(odd) {
-        background: #EEE;
+        background:#EEE;
       }
-      div.button:nth-of-type(even), div.button:nth-of-type(odd):hover {
-        background: #DDD;
+      div.button:nth-of-type(even) {
+      	background:#CCC;
+      }
+      div.button:nth-of-type(odd):hover {
+        background:#DDD;
       }
       div.button:nth-of-type(even):hover {
-      	background: #CCC;
+      	background:#BBB;
       }
       div.button#root {
-        background: #FFF;
+        background:#FFF;
       }
       div.button#root:hover {
-        color: #710001;
+        color:#710001;
       }
       div.button#root.dialogged {
         height:300px;
         cursor:auto;
-        color: #000;
+        color:#000;
         overflow:auto;
       }
       .init_hidden {
@@ -335,11 +341,17 @@
       	width:100%;
       	overflow:auto;
       }
-      div#editor {
+      div#editor_wrap {
       	top:0px;
       	bottom:50%;
       	width:100%;
       	background:#FFF;
+      }
+      div#editor {
+      	top:71px;
+      	bottom:0px;
+      	left:0px;
+      	right:0px;
       }
       div#console {
       	border-top:1px solid #888;
@@ -347,6 +359,17 @@
       	bottom:0px;
       	width:100%;
       	background:#FFF;
+      }
+      button#clearconsole {
+      	position:absolute;
+      	top:-20px;
+      	right:5px;
+      	width:30px;
+      	height:30px;
+      	background:#000071;
+      }
+      button#clearconsole:hover {
+      	background:#00F;
       }
     </style>
   </head>
@@ -373,13 +396,24 @@
         </div>
       </div>
       <div class="blockish" id="right_wrap">
-      	<div class="blockish" id="editor">
+      	<div class="blockish" id="editor_wrap">
       		<div class="filleditorheader"></div>
       		<div class="editorheader">Editor</div>
+      		<div id="editor" class="blockish"></div>
+      		<script src="src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+					<script>
+    				var editor = ace.edit("editor");
+    				editor.setTheme("ace/theme/github");
+    				editor.getSession().setMode("ace/mode/javascript");
+    				editor.getSession().setTabSize(2);
+					</script>
       	</div>
       	<div class="blockish" id="console">
       		<div class="fillconsoleheader"></div>
-      		<div class="consoleheader">Console</div>
+      		<div class="consoleheader">
+      			Console
+      			<button id="clearconsole" class="field">C</button>
+      		</div>
         	<div class="monospace" id="log"></div>
         </div>
       </div>
