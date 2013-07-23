@@ -6,6 +6,6 @@ Code format:
 	equals: "is"
 	greater than: "is more than"
 	less than: "is less than"
-	loop: "loop" + ("if" + parameter)(optional; if absent, assume run forever) ("loop if pineapples is 1")
+	loop: "loop" + ("while" + parameter)(optional; if absent, assume run forever) ("loop if pineapples is 1")
 	if: "if" + parameters ("if (pineapples is more than 0 and pineapples is less than 3) or pineapples is 4")
 	if/loop: open with "[" after parameters then close with "]"
