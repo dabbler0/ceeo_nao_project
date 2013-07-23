@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import re
 
 #############################################
@@ -10,7 +11,7 @@ operators = {
   "+": lambda a, b: a + b
 }
 
-operator_priority_list = ["+", "-", "*", "/"]
+operator_priority_list = ["root", "+", "-", "*", "/"]
 
 class Stack:
   #Fields
@@ -90,23 +91,39 @@ class Function:
 ##########
 
 class TreeNode:
+  manner = None
   value = None
   parent = None
-  children = []
-  parenDepth = 0
-  def __init__(self, value, parent, parenDepth = 0):
+  children = None
+  paren_depth = 0
+
+  def __init__(self, value, parent, paren_depth, manner = 0):
     self.parent = parent
     self.value = value
-    self.parenDepth = parenDepth
+    self.paren_depth = paren_depth
+    self.manner = manner
+    self.children = []
   
-  def birth(self, value):
-    new_child = TreeNode(value, self)
-    children.append(new_child)
+  def birth(self, value, paren_depth):
+    new_child = TreeNode(value, self, paren_depth)
+    self.children.append(new_child)
     return new_child
   
   def replaceChild(self, to_remove, to_add):
-    filter(lambda x: x is not to_remove, children)
-    self.birth(to_add)
+    new_node = TreeNode(to_add, self, self.paren_depth)
+    for i in range(0, len(self.children)):
+      if self.children[i] is to_remove:
+        # Snip the addition in here and kick out the unwanted child.
+        self.children[i] = new_node
+        new_node.children.append(to_remove)
+        to_remove.parent = new_node
+    return new_node
+
+  def toString(self):
+    strung_array = []
+    for child in self.children:
+      strung_array.append(child.toString())
+    return "%s: [%s]" % (self.value, ", ".join(strung_array))
 
 def hasPriority(o1, o2):
   for operator in operator_priority_list:
@@ -127,13 +144,15 @@ def parse (text, indentation):
     old_length = len(line)
     new_line = line.lstrip()
     indent = old_length - len(new_line)
-
+    
     if (indent < indentation):
       # They unindented, so we're done here.
       return (block, lines[current_index:])
+
     elif (indent > indentation):
       # They indented, so we recurse.
       (block[current_index][1], lines) = parse(text[current_index:], indent) # Here we hang the parsed stuff as a block on the last parsed statement.
+    
     else:
       tokenization = []
       latest_token = ""
@@ -141,30 +160,51 @@ def parse (text, indentation):
       
       # Tokenize the line
       for character in new_line:
-        if character.isalphanum() == alphanumeric and character != ' ':
+        if character.isalnum() == alphanumeric and character != ' ':
           latest_token += character
         else:
-          alphanumeric = character.isalphanum()
-          tokenization.append(latest_token)
-          latest_token = character
-      
+          alphanumeric = character.isalnum() if character != ' ' else alphanumeric
+          if len(latest_token) > 0:
+            tokenization.append(latest_token)
+          latest_token = character if character != ' ' else ''
+      tokenization.append(latest_token)
+
+      print tokenization
+
+      tree = TreeNode("root", None, 0)
+      current_paren_depth = 0
+
       # Parse the tokenization
+      last_token = None
       for token in tokenization:
-        if token == '(':
+        if last_token is not None and last_token.isalnum() and token.isalnum():
+          tree.manner = 1 # Signify that this is a function call node
+          tree.birth(token, current_paren_depth)
+        elif token == '(':
           current_paren_depth += 1
         elif token == ')':
           current_paren_depth -= 1
         else:
           strung_child = None
-          while tree.paren_depth == current_paren_depth and hasPriority(tree.value, token):
+          while (tree.paren_depth < current_paren_depth) or (tree.paren_depth == current_paren_depth and (not hasPriority(tree.value, token)) and (not (tree.manner == 1))):
             strung_child = tree
             tree = tree.parent
           if strung_child is not None:
-            tree.replaceChild(strung_child, token)
+            print "Stringing"
+            tree = tree.replaceChild(strung_child, token)
           else:
-            tree.birth(token)
+            print "Not stringing, so birthing directly to %s." % tree.value
+            tree = tree.birth(token, current_paren_depth)
+        last_token = token
+      while tree.parent is not None:
+        tree = tree.parent
+      block.append(tree)
+  return (block, [])
 
-
+if __name__ == "__main__":
+  (lines,throw_away) = parse(raw_input(), 0)
+  for line in lines:
+    print line.toString()
 """
 def jsonConvertLine(line):
   if isinstance(line, int):
