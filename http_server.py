@@ -21,7 +21,7 @@ adproxy = ALProxy("ALAudioDevice", "localhost", 9559)
 
 def dVFloat (dic, key, val):
   #Parse a dictionary element as a float if it exists, otherwise default to (val).
-  return dic[key] if key in dic else val
+  return float(dic[key]) if key in dic else val
 
 class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
   def do_GET(self):
