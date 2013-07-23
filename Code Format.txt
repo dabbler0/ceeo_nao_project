@@ -1,11 +1,16 @@
 Code format:
 	separate program commands with a line break
 	robot command: "run" + command + parameters (name + value) separated by ", " ("run say text bears, speed .8")
-	add variable: "add var" + name + value (optional) ("add var pineapples 1")
-	set variable value: "set var" + name + value ("set var pineapples 2")
+	add variable: "add var" + name + value (optional) ("add var pineapples")
+	set variable value: "set" + name + "to" + value ("set pineapples to 2")
+	input: "input" + "prompt"(optional) ("set var berries input 'How many berries?'")
 	equals: "is"
 	greater than: "is more than"
 	less than: "is less than"
-	loop: "loop" + ("while" + parameter)(optional; if absent, assume run forever) ("loop if pineapples is 1")
-	if: "if" + parameters ("if (pineapples is more than 0 and pineapples is less than 3) or pineapples is 4")
-	if/loop: open with "[" after parameters then close with "]"
+	and, or, not, +, -, *, /: just normal python syntax
+	if/loop/function: open with "[" after parameters then close with "]"
+	loop: "loop" + ("while" + parameter)(optional; if absent, assume run forever) ("loop while pineapples is 1 []")
+	if: "if" + parameters ("if (pineapples is more than 0 and pineapples is less than 3) or pineapples is 4 []")
+	function: "add function" + name + names of parameters separated by ", " ("add function eat pears, pineapples []")
+	print: "respond" + string to respond ("respond 'I have' + pineapples + 'pineapples'")
+>>>>>>> f1a469bc93ca978f55524c0b21db0015d5c6b38a

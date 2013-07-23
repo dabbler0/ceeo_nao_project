@@ -24,10 +24,12 @@
               root_button.after(new_button = $("<div>").addClass("button").text(new_button_obj.name).attr("title", new_button_obj.commands).click(function() {
                 interpretation = interpret(new_button_obj.commands);
                 for (var i = 0; i < interpretation.length; i += 1) {
-                  log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "] " + interpretation[i]);
+                  log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "] " + new_button_obj.commands.split('\n')[i]);
                   log.append(log_div);
                   $.ajax({
                     url: "http://130.64.94.79:8080/execute?" + interpretation[i], error: function(blah, blah2, err) {
+                      console.log(blah);
+                      console.log(blah2);
                       console.log(err);
                     },
                     dataType: "json",
