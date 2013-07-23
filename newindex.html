@@ -117,20 +117,19 @@
         left:0px;
         top:0px;
         bottom:0px;
-        right:50%;
-        overflow:auto;
+        width:350px;
+        box-shadow:1px 0px 1px #888 inset;
       }
       div.blockish#right_wrap {
-        left:50%;
         top:0px;
         bottom:0px;
         right:0px;
+        left:350px;
         border-left:1px solid #888;
-        box-shadow: 1px 0px 1px #888 inset;
+        overflow:auto;
       }
       div#left_wrap {
-        background: #FFF;
-        font-family: monospace;
+        background:#FFF;
         overflow:auto;
       }
       div.button {
@@ -279,12 +278,12 @@
       div.consoleheader {
       	font-size:20px;
       	font-family:'Lato';
-      	position:fixed;
+      	position:relative;
       	top:25px;
       	left:0px;
-      	width:50%;
+      	width:100%;
       	height:45px;
-      	border-bottom:1px solid black;
+      	border-bottom:1px solid #888;
       	text-align:center;
       }
       div#log {
@@ -294,15 +293,24 @@
       	width:100%;
       	overflow:auto;
       }
+      div#editor {
+      	top:0px;
+      	bottom:50%;
+      	width:100%;
+      	background:#FFF;
+      }
+      div#console {
+      	border-top:1px solid #888;
+      	top:50%;
+      	bottom:0px;
+      	width:100%;
+      	background:#FFF;
+      }
     </style>
   </head>
   <body>
     <div class="blockish" id="big_wrapper">
       <div class="blockish" id="left_wrap">
-      	<div class="consoleheader">Console</div>
-        <div class="monospace" id="log"></div>
-      </div>
-      <div class="blockish" id="right_wrap">
         <div id="button_list">
           <div class="button" id="root">
             + Create a Button
@@ -320,6 +328,13 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div class="blockish" id="right_wrap">
+      	<div class="blockish" id="editor"></div>
+      	<div class="blockish" id="console">
+      		<div class="consoleheader">Console</div>
+        	<div class="monospace" id="log"></div>
         </div>
       </div>
     </div>
