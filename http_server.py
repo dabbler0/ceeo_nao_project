@@ -34,7 +34,9 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     for key in qwargs:
       qwargs[key] = qwargs[key][0]
     
-    if path[1] == "index.html" or len(path) < 2:
+    print path
+
+    if len(path) < 2 or path[1] == '' or path[1] == "index.html":
       index_file = open("index.html")
       self.send_response(200)
       self.send_header("Content-type", "text/html")
