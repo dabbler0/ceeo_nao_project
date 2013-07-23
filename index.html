@@ -21,17 +21,16 @@
                 "name": nbname.val(),
                 "commands": nbcmd.val()
               });
-              root_button.after(new_button = $("<div>").addClass("button").text(new_button_obj.name).attr("title", new_button_obj.commands).click(function() {
+              root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).click(function() {
                 interpretation = interpret(new_button_obj.commands);
                 for (var i = 0; i < interpretation.length; i += 1) {
                   log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "] " + new_button_obj.commands.split('\n')[i]);
                   log.append(log_div);
+                  log_div[0].scrollIntoView(false);
                   $.ajax({
-                    url: "http://130.64.94.79:8080/execute?" + interpretation[i], error: function(blah, blah2, err) {
-                      console.log(blah);
-                      console.log(blah2);
-                      console.log(err);
-                    },
+                    url: "http://130.64.94.79:8080/execute?" + interpretation[i], /*error: function(blah, err, log_div) {
+                      if (err == 'error') log_div.append($('<div>').addClass('indented').text("couldn't connect"));
+                    }(log_div),*/
                     dataType: "json",
                     success: (function(log_div) {
                       return function(response) {
@@ -40,20 +39,23 @@
                     }(log_div))
                   });
                 }
-              })).append($('<div>').addClass('init_hidden').attr('id', 'button_dialog').html('<div class="field_wrapper">Name: <input class="field" id="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" id="button_new_commands"></textarea></div>').append($('<button>').attr('id', "done").text('done').click(function() {
-              	new_button.text($('#button_new_name').val())
-              	new_button.attr('title', $('#button_new_commands').val());
-              	new_button.removeClass('dialogged');
-              	$('#button_dialog').hide();
-              })).append($('<button>').addClass('edit').addClass('field').text('E').click(function() {
-              	new_button.addClass('dialogged');
+              }).append($('<button>').addClass('edit').addClass('field').addClass('greenfield').text('E').click(function() {
+                $('#button_new_name').val(new_button.children().eq(2).text());
+                $('#button_new_commands').val(new_button_obj.commands);
+              	new_button.addClass('bdialogged');
               	setTimeout(function() {
-              		$('#button_dialog').show();
+              		new_button.children('.button_dialog').show();
               	}, 300);
-              })).append($("<button>").addClass("delete").addClass('field').text('D').click(function() {
+              })).append($("<button>").addClass('delete').addClass('field').text('D').click(function() {
                 new_button.remove();
                 buttons.splice(nindex, 1);
-              })));
+              })).append($('<div>').text(new_button_obj.name)).append($('<div>').addClass('init_hidden').addClass('button_dialog').html('<div class="field_wrapper">Name: <input class="field" id="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" id="button_new_commands"></textarea></div>').append($('<button>').addClass('field').text('done').click(function() {
+              	new_button.children().eq(2).text($('#button_new_name').val());
+              	new_button_obj.name = $('#button_new_name').val();
+              	new_button_obj.commands = $('#button_new_commands').val();
+              	new_button.removeClass('bdialogged');
+              	new_button.children('.button_dialog').hide();
+              }))));
               root_button.removeClass("dialogged");
               $("#root_dialog").hide();
               nbname.val(""); nbcmd.val("");
@@ -171,7 +173,7 @@
         box-shadow: 0 0 2px #888 inset;
       }
       button.field {
-        background:#710001;
+        background:#710000;
         font-family:'Lato', 'Verdana', 'Arial', sans-serif;
         color: #FFF;
         font-size: 12px;
@@ -183,6 +185,12 @@
       }
       button.field:hover, button.field:focus {
         background:#F00;
+      }
+      button.greenfield {
+      	background:#007100;
+      }
+      button.greenfield:hover {
+      	background:#0F0;
       }
       div#button_list {
         left:0;
@@ -229,20 +237,41 @@
       div.monospace {
       	font-family:monospace;
       	font-size:12px;
-        white-space: pre;
+        white-space:pre;
       }
       button.delete {
       	position:absolute;
       	right:9px;
       	width:30px;
-      	height: 30px;
+      	height:30px;
       }
       button.edit {
-      	transition: background 0.3s ease-in, height 0.3s ease-in;
+      	position:absolute;
+      	right:48px;
+      	width:30px;
+      	height:30px;
       }
-      button.dialogged {
+      div.bdialogged {
       	height:300px;
-      	color:'#FFF';
+      	background:#FFF;
+      	overflow:auto;
+      }
+      div.consoleheader {
+      	font-size:20px;
+      	font-family:'Lato';
+      	position:fixed;
+      	top:25px;
+      	left:0px;
+      	width:50%;
+      	height:45px;
+      	border-bottom:1px solid black;
+      	text-align:center;
+      }
+      div#log {
+      	position:absolute;
+      	top:70px;
+      	bottom:0;
+      	width:100%;
       	overflow:auto;
       }
     </style>
@@ -250,6 +279,7 @@
   <body>
     <div class="blockish" id="big_wrapper">
       <div class="blockish" id="left_wrap">
+      	<div class="consoleheader">Console</div>
         <div class="monospace" id="log"></div>
       </div>
       <div class="blockish" id="right_wrap">
