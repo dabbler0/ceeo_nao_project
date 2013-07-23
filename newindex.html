@@ -9,7 +9,10 @@
             root_button = $("div#root").click(function() {
               if (!root_expanded) {
                 root_button.addClass("dialogged");
-                setTimeout(function() {$("#root_dialog").show();}, 300);
+                setTimeout(function() {
+					$("#root_dialog").show();
+					nbname.select();
+				}, 300);
                 root_expanded = true;
               }
             }),
@@ -63,7 +66,7 @@
                 buttons.splice(nindex, 1);
               })).append($('<div>').addClass('button_title').text(new_button_obj.name)).append($('<div>').addClass('init_hidden').addClass('button_dialog').html('<div class="field_wrapper">Name: <input class="field" class="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" class="button_new_commands"></textarea></div>').append($('<button>').addClass('field').text('done').click(function() {
               	new_button_obj.name = new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val();
-								new_button.children('.button_title').text(new_button_obj.name);
+				new_button.children('.button_title').text(new_button_obj.name);
               	new_button_obj.commands = new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val();
               	new_button.attr('title', new_button_obj.commands);
               	new_button.removeClass('adialogged');
@@ -75,13 +78,18 @@
               root_button.removeClass("dialogged");
               $("#root_dialog").hide();
               nbname.val(""); nbcmd.val("");
-              setTimeout(function() { root_expanded = false }, 0);
+              setTimeout(function() {
+				root_expanded = false;
+			  }, 0);
             }),
             cancel_button = $("button#cancel").click(function() {
               root_button.removeClass("dialogged");
               $("#root_dialog").hide();
-              nbname.val(""); nbcmd.val("");
-              setTimeout(function() { root_expanded = false }, 0);
+              nbname.val("");
+			  nbcmd.val("");
+              setTimeout(function() {
+				root_expanded = false;
+			  }, 0);
             }),
             nbname = $("#new_button_name"),
             nbcmd = $("#new_button_commands");
@@ -360,7 +368,7 @@
       	width:100%;
       	background:#FFF;
       }
-      button#clearconsole {
+      button#clearconsole, button#cleareditor {
       	position:absolute;
       	top:-20px;
       	right:5px;
@@ -368,9 +376,20 @@
       	height:30px;
       	background:#000071;
       }
-      button#clearconsole:hover {
+	  button#newebutton {
+      	position:absolute;
+      	top:-20px;
+      	right:40px;
+      	width:30px;
+      	height:30px;
+      	background:#703800;
+      }
+      button#clearconsole:hover, button#cleareditor:hover {
       	background:#00F;
       }
+	  button#newebutton:hover {
+		background:#FF8000;
+	  }
     </style>
   </head>
   <body>
@@ -398,21 +417,37 @@
       <div class="blockish" id="right_wrap">
       	<div class="blockish" id="editor_wrap">
       		<div class="filleditorheader"></div>
-      		<div class="editorheader">Editor</div>
+      		<div class="editorheader">
+				Editor
+				<button id="newebutton" class="field" title="New button from editor">N</button>
+				<button id="cleareditor" class="field" title="Clear">C</button>
+			</div>
       		<div id="editor" class="blockish"></div>
-      		<script src="src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-					<script>
-    				var editor = ace.edit("editor");
-    				editor.setTheme("ace/theme/github");
-    				editor.getSession().setMode("ace/mode/javascript");
-    				editor.getSession().setTabSize(2);
-					</script>
+      		<script src="src-noconflict/ace.js"></script>
+			<script>
+    			var editor = ace.edit("editor");
+				editor.setTheme("ace/theme/github");
+				editor.getSession().setMode("ace/mode/javascript");
+				editor.getSession().setTabSize(2);
+				$('button#cleareditor').click(function() {
+					editor.setValue('');
+				});
+				$('button#newebutton').click(function() {
+					console.log('Clicked');
+					$('div#root').addClass('dialogged');
+					setTimeout(function() {
+						$('#root_dialog').show();
+						$('#new_button_name').select();
+					}, 300);
+					$('#new_button_commands').val(editor.getValue());
+				});
+			</script>
       	</div>
       	<div class="blockish" id="console">
       		<div class="fillconsoleheader"></div>
       		<div class="consoleheader">
       			Console
-      			<button id="clearconsole" class="field">C</button>
+      			<button id="clearconsole" class="field" title="Clear">C</button>
       		</div>
         	<div class="monospace" id="log"></div>
         </div>
