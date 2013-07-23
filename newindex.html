@@ -41,28 +41,35 @@
                 }
               })).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
                 if (new_button.children('.button_dialog').css('display') == 'none') {
-                  $('#button_new_name').val(new_button.children().eq(3).text());
-                  $('#button_new_commands').val(new_button_obj.commands);
-              	  new_button.addClass('bdialogged');
+                  new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val(new_button_obj.name);
+                  new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val(new_button_obj.commands);
+              	  if (new_button.children('.button_title').text() == '') new_button.addClass('bdialogged');
+              	  else new_button.addClass('adialogged');
               	  new_button.children('.edit').text('C').attr('title', 'Cancel');
+              	  new_button.children('.run').css('opacity', '0');
               	  setTimeout(function() {
-              		new_button.children('.button_dialog').show();
+              			new_button.children('.button_dialog').show();
               	  }, 300);
               	}
               	else {
+              	  new_button.removeClass('adialogged');
               	  new_button.removeClass('bdialogged');
               	  new_button.children('.edit').text('E').attr('title', 'Edit');
+              	  new_button.children('.run').css('opacity', '100');
               	  new_button.children('.button_dialog').hide();
               	}
               })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
                 new_button.remove();
                 buttons.splice(nindex, 1);
-              })).append($('<div>').text(new_button_obj.name)).append($('<div>').addClass('init_hidden').addClass('button_dialog').html('<div class="field_wrapper">Name: <input class="field" id="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" id="button_new_commands"></textarea></div>').append($('<button>').addClass('field').text('done').click(function() {
-              	new_button.children().eq(3).text($('#button_new_name').val());
-              	new_button_obj.name = $('#button_new_name').val();
-              	new_button_obj.commands = $('#button_new_commands').val();
+              })).append($('<div>').addClass('button_title').text(new_button_obj.name)).append($('<div>').addClass('init_hidden').addClass('button_dialog').html('<div class="field_wrapper">Name: <input class="field" class="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" class="button_new_commands"></textarea></div>').append($('<button>').addClass('field').text('done').click(function() {
+              	new_button_obj.name = new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val();
+								new_button.children('.button_title').text(new_button_obj.name);
+              	new_button_obj.commands = new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val();
+              	new_button.attr('title', new_button_obj.commands);
+              	new_button.removeClass('adialogged');
               	new_button.removeClass('bdialogged');
               	new_button.children('.edit').text('E').attr('title', 'Edit');
+              	new_button.children('.run').css('opacity', '100');
               	new_button.children('.button_dialog').hide();
               }))));
               root_button.removeClass("dialogged");
@@ -238,7 +245,7 @@
       }
       div.monospace {
       	font-family:'Courier New';
-      	font-size:14px;
+      	font-size:13px;
         white-space:pre;
       }
       button.delete {
@@ -266,25 +273,60 @@
       	width:30px;
       	height:30px;
       	background:#000071;
+      	transition:opacity 0.3s ease-in;
       }
       button.run:hover {
       	background:#00F;
       }
-      div.bdialogged {
+      div.adialogged {
       	height:300px;
       	background:#FFF;
       	overflow:auto;
       }
-      div.consoleheader {
+      div.bdialogged {
+      	height:250px;
+      	background:#FFF;
+      	overflow:auto;
+      }
+      div.filleditorheader {
+      	position:relative;
+      	top:0px;
+      	left:0px;
+      	width:100%;
+      	height:25px;
+      	background:#EEE;
+      }
+      div.editorheader {
       	font-size:20px;
       	font-family:'Lato';
       	position:relative;
-      	top:25px;
+      	top:0px;
       	left:0px;
       	width:100%;
       	height:45px;
       	border-bottom:1px solid #888;
       	text-align:center;
+      	background:#EEE;
+      }
+      div.fillconsoleheader {
+      	position:relative;
+      	top:0px;
+      	left:0px;
+      	width:100%;
+      	height:25px;
+      	background:#EEE;
+      }
+      div.consoleheader {
+      	font-size:20px;
+      	font-family:'Lato';
+      	position:relative;
+      	top:0px;
+      	left:0px;
+      	width:100%;
+      	height:45px;
+      	border-bottom:1px solid #888;
+      	text-align:center;
+      	background:#EEE;
       }
       div#log {
       	position:absolute;
@@ -331,8 +373,12 @@
         </div>
       </div>
       <div class="blockish" id="right_wrap">
-      	<div class="blockish" id="editor"></div>
+      	<div class="blockish" id="editor">
+      		<div class="filleditorheader"></div>
+      		<div class="editorheader">Editor</div>
+      	</div>
       	<div class="blockish" id="console">
+      		<div class="fillconsoleheader"></div>
       		<div class="consoleheader">Console</div>
         	<div class="monospace" id="log"></div>
         </div>
