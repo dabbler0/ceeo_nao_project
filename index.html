@@ -77,24 +77,25 @@
 						"commands": editor.getValue()
 					});
 					root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
-						interpretation = interpret(new_button_obj.commands);
-						for (var i = 0; i < interpretation.length; i += 1) {
-							log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "] " + new_button_obj.commands.split('\n')[i]);
-							log.append(log_div);
-							log_div[0].scrollIntoView(false);
-							$.ajax({
-								url: "/execute?" + interpretation[i], /*error: function(blah, err, log_div) {
-									if (err == 'error') log_div.append($('<div>').addClass('indented').text("couldn't connect"));
-								}(log_div),*/
-								dataType: "json",
-								success: (function(log_div) {
-									return function(server_response) {
-										log_div.append($('<div>').addClass('indented').text(server_response.response));
-										log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
-									}
-								}(log_div))
-							});
-						}
+						interpretation = new_button_obj.commands.split('\n');
+						log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
+						log.append(log_div);
+						log_div[0].scrollIntoView(false);
+						$.ajax({
+							method: 'POST',
+							url: '/code',
+							data: {
+								'data': JSON.stringify({'code': interpretation})
+							},
+							dataType: 'json',
+							success: (function(log_div) {
+								return function(server_response) {
+									log_div.append($('<div>').addClass('indented').text(server_response.response));
+									log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
+									log_div.children().last()[0].scrollIntoView(false);
+								}
+							}(log_div))
+						});
 					})).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
 						if (new_button.children('.button_dialog').css('display') == 'none') {
 							new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val(new_button_obj.name);
@@ -154,24 +155,25 @@
 					$('button#runbutton').show();
 				});
 				$('button#runbutton').click(function() {
-					interpretation = interpret(editor.getValue());
-					for (var i = 0; i < interpretation.length; i += 1) {
-						log_div = $("<div>").addClass("log").text("[Editor] " + editor.getValue().split('\n')[i]);
-						log.append(log_div);
-						log_div[0].scrollIntoView(false);
-						$.ajax({
-							url: "/execute?" + interpretation[i], /*error: function(blah, err, log_div) {
-								if (err == 'error') log_div.append($('<div>').addClass('indented').text("couldn't connect"));
-							}(log_div),*/
-							dataType: "json",
-							success: (function(log_div) {
-								return function(server_response) {
-									log_div.append($('<div>').addClass('indented').text(server_response.response));
-									log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
-								}
-							}(log_div))
-						});
-					}
+					interpretation = editor.getValue().split('\n');
+					log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
+					log.append(log_div);
+					log_div[0].scrollIntoView(false);
+					$.ajax({
+						method: 'POST',
+						url: '/code',
+						data: {
+							'data': JSON.stringify({'code': interpretation})
+						},
+						dataType: 'json',
+						success: (function(log_div) {
+							return function(server_response) {
+								log_div.append($('<div>').addClass('indented').text(server_response.response));
+								log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
+								log_div.children().last()[0].scrollIntoView(false);
+							}
+						}(log_div))
+					});
 				});
 				$('button#deny').click(function() {
 					$('div.confirmation').hide();
