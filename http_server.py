@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import BaseHTTPServer
+import urllib
 import urlparse
 import simplejson as json
 import math
@@ -149,6 +150,13 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       self.end_headers()
       self.wfile.write(lfile.read())
       lfile.close()
+    elif path[1] == 'getbuttons':
+      buttonsfile = open('buttons.txt')
+      self.send_response(200)
+      self.send_header("Content-Type", "text/plain")
+      self.end_headers()
+      self.wfile.write(buttonsfile.read())
+      buttonfile.close()
 
   def do_POST(self):
     #Parse the given path
@@ -167,11 +175,32 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       wfile.write(self.rfile.read())
       wfile.close()
       reply["success"] = True
+    elif path[1] == 'setbutton':
+      buttondata = urllib.unquote(self.rfile.read()).replace('+', ' ')
+      reply["success"] = True
+      buttonsfile = open('buttons.txt')
+      contents = buttonsfile.read()
+      buttonsfile.close()
+      if contents.index('\n[' + buttondata['name'] + ']') == -1:
+        wbuttonsfile = open('buttons.txt', 'wa')
+        wbuttonsfile.write('[' + buttondata['name'] + '][' + buttondata['commands'] + ']\n');
+        wbuttonsfile.close()
+      else:
+        if buttondata['delete']:
+          startlocation = contents.index('\n[' + buttondata['name'] + ']')
+          wbuttonsfile = open('buttons.txt', 'w')
+          wbuttonsfile.write(contents[:startlocation - 1] + contents[contents.index('\n', startlocation):])
+          wbuttonsfile.close()
+        else:
+          startlocation = contents.index('\n[' + buttondata['name'] + ']')
+          wbuttonsfile = open('buttons.txt', 'w')
+          wbuttonsfile.write(contents[:startlocation + len(buttondata['name']) + 2] + buttondata['commands'] + contents[contents.index('\n', startlocation) - 1:])
+          wbuttonsfile.close()
 
     self.send_response(200)
     self.send_header("Content-Type", "application/json")
     self.end_headers()
-    self.wfile.write(simplejson.dumps(reply))
+    self.wfile.write(json.dumps(reply))
 
 if __name__ == "__main__":
   ip_address = netproxy.getLocalIP()
