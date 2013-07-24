@@ -10,9 +10,9 @@
               if (!root_expanded) {
                 root_button.addClass("dialogged");
                 setTimeout(function() {
-					$("#root_dialog").show();
-					nbname.select();
-				}, 300);
+          $("#root_dialog").show();
+          nbname.select();
+        }, 300);
                 root_expanded = true;
               }
             }),
@@ -25,7 +25,7 @@
                 "commands": nbcmd.val()
               });
               root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
-              	interpretation = interpret(new_button_obj.commands);
+                interpretation = interpret(new_button_obj.commands);
                 for (var i = 0; i < interpretation.length; i += 1) {
                   log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "] " + new_button_obj.commands.split('\n')[i]);
                   log.append(log_div);
@@ -37,7 +37,7 @@
                     dataType: "json",
                     success: (function(log_div) {
                       return function(response) {
-              	        log_div.append($('<div>').addClass('indented').text(response.success ? "Success" : "Failure"));
+                        log_div.append($('<div>').addClass('indented').text(response.success ? "Success" : "Failure"));
                       }
                     }(log_div))
                   });
@@ -46,50 +46,50 @@
                 if (new_button.children('.button_dialog').css('display') == 'none') {
                   new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val(new_button_obj.name);
                   new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val(new_button_obj.commands);
-              	  if (new_button.children('.button_title').text() == '') new_button.addClass('bdialogged');
-              	  else new_button.addClass('adialogged');
-              	  new_button.children('.edit').text('C').attr('title', 'Cancel');
-              	  new_button.children('.run').css('opacity', '0');
-              	  setTimeout(function() {
-              			new_button.children('.button_dialog').show();
-              	  }, 300);
-              	}
-              	else {
-              	  new_button.removeClass('adialogged');
-              	  new_button.removeClass('bdialogged');
-              	  new_button.children('.edit').text('E').attr('title', 'Edit');
-              	  new_button.children('.run').css('opacity', '100');
-              	  new_button.children('.button_dialog').hide();
-              	}
+                  if (new_button.children('.button_title').text() == '') new_button.addClass('bdialogged');
+                  else new_button.addClass('adialogged');
+                  new_button.children('.edit').text('C').attr('title', 'Cancel');
+                  new_button.children('.run').css('opacity', '0');
+                  setTimeout(function() {
+                    new_button.children('.button_dialog').show();
+                  }, 300);
+                }
+                else {
+                  new_button.removeClass('adialogged');
+                  new_button.removeClass('bdialogged');
+                  new_button.children('.edit').text('E').attr('title', 'Edit');
+                  new_button.children('.run').css('opacity', '100');
+                  new_button.children('.button_dialog').hide();
+                }
               })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
                 new_button.remove();
                 buttons.splice(nindex, 1);
               })).append($('<div>').addClass('button_title').text(new_button_obj.name)).append($('<div>').addClass('init_hidden').addClass('button_dialog').html('<div class="field_wrapper">Name: <input class="field" class="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" class="button_new_commands"></textarea></div>').append($('<button>').addClass('field').text('done').click(function() {
-              	new_button_obj.name = new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val();
-				new_button.children('.button_title').text(new_button_obj.name);
-              	new_button_obj.commands = new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val();
-              	new_button.attr('title', new_button_obj.commands);
-              	new_button.removeClass('adialogged');
-              	new_button.removeClass('bdialogged');
-              	new_button.children('.edit').text('E').attr('title', 'Edit');
-              	new_button.children('.run').css('opacity', '100');
-              	new_button.children('.button_dialog').hide();
+                new_button_obj.name = new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val();
+        new_button.children('.button_title').text(new_button_obj.name);
+                new_button_obj.commands = new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val();
+                new_button.attr('title', new_button_obj.commands);
+                new_button.removeClass('adialogged');
+                new_button.removeClass('bdialogged');
+                new_button.children('.edit').text('E').attr('title', 'Edit');
+                new_button.children('.run').css('opacity', '100');
+                new_button.children('.button_dialog').hide();
               }))));
               root_button.removeClass("dialogged");
               $("#root_dialog").hide();
               nbname.val(""); nbcmd.val("");
               setTimeout(function() {
-				root_expanded = false;
-			  }, 0);
+        root_expanded = false;
+        }, 0);
             }),
             cancel_button = $("button#cancel").click(function() {
               root_button.removeClass("dialogged");
               $("#root_dialog").hide();
               nbname.val("");
-			  nbcmd.val("");
+        nbcmd.val("");
               setTimeout(function() {
-				root_expanded = false;
-			  }, 0);
+        root_expanded = false;
+        }, 0);
             }),
             nbname = $("#new_button_name"),
             nbcmd = $("#new_button_commands");
@@ -116,7 +116,7 @@
           return rarray;
         }
         $('button#clearconsole').click(function() {
-        	log.html('');
+          log.html('');
         });
       })
     </script>
@@ -165,13 +165,13 @@
         background:#EEE;
       }
       div.button:nth-of-type(even) {
-      	background:#CCC;
+        background:#CCC;
       }
       div.button:nth-of-type(odd):hover {
         background:#DDD;
       }
       div.button:nth-of-type(even):hover {
-      	background:#BBB;
+        background:#BBB;
       }
       div.button#root {
         background:#FFF;
@@ -247,149 +247,149 @@
         overflow:auto;
       }
       div.console {
-      	top:0;
-      	bottom:0;
-      	right:0;
+        top:0;
+        bottom:0;
+        right:0;
         left:0;
-      	position:absolute;
+        position:absolute;
         padding:5px;
       }
       div.indented {
         padding-left:10px;
       }
       div.monospace {
-      	font-family:'Courier New';
-      	font-size:13px;
+        font-family:'Courier New';
+        font-size:13px;
         white-space:pre;
       }
       button.delete {
-      	position:absolute;
-      	right:9px;
-      	width:30px;
-      	height:30px;
+        position:absolute;
+        right:9px;
+        width:30px;
+        height:30px;
       }
       button.delete:hover {
-      	background:#F00;
+        background:#F00;
       }
       button.edit {
-      	position:absolute;
-      	right:48px;
-      	width:30px;
-      	height:30px;
-      	background:#007100;
+        position:absolute;
+        right:48px;
+        width:30px;
+        height:30px;
+        background:#007100;
       }
       button.edit:hover {
-      	background:#0F0;
+        background:#0F0;
       }
       button.run {
-      	position:absolute;
-      	right:87px;
-      	width:30px;
-      	height:30px;
-      	background:#000071;
-      	transition:opacity 0.3s ease-in;
+        position:absolute;
+        right:87px;
+        width:30px;
+        height:30px;
+        background:#000071;
+        transition:opacity 0.3s ease-in;
       }
       button.run:hover {
-      	background:#00F;
+        background:#00F;
       }
       div.adialogged {
-      	height:300px;
-      	background:#FFF;
-      	overflow:auto;
+        height:300px;
+        background:#FFF;
+        overflow:auto;
       }
       div.bdialogged {
-      	height:250px;
-      	background:#FFF;
-      	overflow:auto;
+        height:250px;
+        background:#FFF;
+        overflow:auto;
       }
       div.filleditorheader {
-      	position:relative;
-      	top:0px;
-      	left:0px;
-      	width:100%;
-      	height:25px;
-      	background:#EEE;
+        position:relative;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:25px;
+        background:#EEE;
       }
       div.editorheader {
-      	font-size:20px;
-      	font-family:'Lato';
-      	position:relative;
-      	top:0px;
-      	left:0px;
-      	width:100%;
-      	height:45px;
-      	border-bottom:1px solid #888;
-      	text-align:center;
-      	background:#EEE;
+        font-size:20px;
+        font-family:'Lato';
+        position:relative;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:45px;
+        border-bottom:1px solid #888;
+        text-align:center;
+        background:#EEE;
       }
       div.fillconsoleheader {
-      	position:relative;
-      	top:0px;
-      	left:0px;
-      	width:100%;
-      	height:25px;
-      	background:#EEE;
+        position:relative;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:25px;
+        background:#EEE;
       }
       div.consoleheader {
-      	font-size:20px;
-      	font-family:'Lato';
-      	position:relative;
-      	top:0px;
-      	left:0px;
-      	width:100%;
-      	height:45px;
-      	border-bottom:1px solid #888;
-      	text-align:center;
-      	background:#EEE;
+        font-size:20px;
+        font-family:'Lato';
+        position:relative;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:45px;
+        border-bottom:1px solid #888;
+        text-align:center;
+        background:#EEE;
       }
       div#log {
-      	position:absolute;
-      	top:70px;
-      	bottom:0;
-      	width:100%;
-      	overflow:auto;
+        position:absolute;
+        top:70px;
+        bottom:0;
+        width:100%;
+        overflow:auto;
       }
       div#editor_wrap {
-      	top:0px;
-      	bottom:50%;
-      	width:100%;
-      	background:#FFF;
+        top:0px;
+        bottom:50%;
+        width:100%;
+        background:#FFF;
       }
       div#editor {
-      	top:71px;
-      	bottom:0px;
-      	left:0px;
-      	right:0px;
+        top:71px;
+        bottom:0px;
+        left:0px;
+        right:0px;
       }
       div#console {
-      	border-top:1px solid #888;
-      	top:50%;
-      	bottom:0px;
-      	width:100%;
-      	background:#FFF;
+        border-top:1px solid #888;
+        top:50%;
+        bottom:0px;
+        width:100%;
+        background:#FFF;
       }
       button#clearconsole, button#cleareditor {
-      	position:absolute;
-      	top:-20px;
-      	right:5px;
-      	width:30px;
-      	height:30px;
-      	background:#000071;
+        position:absolute;
+        top:-20px;
+        right:5px;
+        width:30px;
+        height:30px;
+        background:#000071;
       }
-	  button#newebutton {
-      	position:absolute;
-      	top:-20px;
-      	right:40px;
-      	width:30px;
-      	height:30px;
-      	background:#703800;
+    button#newebutton {
+        position:absolute;
+        top:-20px;
+        right:40px;
+        width:30px;
+        height:30px;
+        background:#703800;
       }
       button#clearconsole:hover, button#cleareditor:hover {
-      	background:#00F;
+        background:#00F;
       }
-	  button#newebutton:hover {
-		background:#FF8000;
-	  }
+    button#newebutton:hover {
+    background:#FF8000;
+    }
     </style>
   </head>
   <body>
@@ -415,41 +415,41 @@
         </div>
       </div>
       <div class="blockish" id="right_wrap">
-      	<div class="blockish" id="editor_wrap">
-      		<div class="filleditorheader"></div>
-      		<div class="editorheader">
-				Editor
-				<button id="newebutton" class="field" title="New button from editor">N</button>
-				<button id="cleareditor" class="field" title="Clear">C</button>
-			</div>
-      		<div id="editor" class="blockish"></div>
-      		<script src="src-noconflict/ace.js"></script>
-			<script>
-    			var editor = ace.edit("editor");
-				editor.setTheme("ace/theme/github");
-				editor.getSession().setMode("ace/mode/javascript");
-				editor.getSession().setTabSize(2);
-				$('button#cleareditor').click(function() {
-					editor.setValue('');
-				});
-				$('button#newebutton').click(function() {
-					console.log('Clicked');
-					$('div#root').addClass('dialogged');
-					setTimeout(function() {
-						$('#root_dialog').show();
-						$('#new_button_name').select();
-					}, 300);
-					$('#new_button_commands').val(editor.getValue());
-				});
-			</script>
-      	</div>
-      	<div class="blockish" id="console">
-      		<div class="fillconsoleheader"></div>
-      		<div class="consoleheader">
-      			Console
-      			<button id="clearconsole" class="field" title="Clear">C</button>
-      		</div>
-        	<div class="monospace" id="log"></div>
+        <div class="blockish" id="editor_wrap">
+          <div class="filleditorheader"></div>
+          <div class="editorheader">
+        Editor
+        <button id="newebutton" class="field" title="New button from editor">N</button>
+        <button id="cleareditor" class="field" title="Clear">C</button>
+      </div>
+      <div id="editor" class="blockish"></div>
+      <script src="src-noconflict/ace.js"></script>
+      <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/github");
+        editor.getSession().setMode("ace/mode/javascript");
+        editor.getSession().setTabSize(2);
+        $('button#cleareditor').click(function() {
+          editor.setValue('');
+        });
+        $('button#newebutton').click(function() {
+          console.log('Clicked');
+          $('div#root').addClass('dialogged');
+          setTimeout(function() {
+            $('#root_dialog').show();
+            $('#new_button_name').select();
+          }, 300);
+          $('#new_button_commands').val(editor.getValue());
+        });
+      </script>
+        </div>
+        <div class="blockish" id="console">
+          <div class="fillconsoleheader"></div>
+          <div class="consoleheader">
+            Console
+            <button id="clearconsole" class="field" title="Clear">C</button>
+          </div>
+          <div class="monospace" id="log"></div>
         </div>
       </div>
     </div>

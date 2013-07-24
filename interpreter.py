@@ -11,7 +11,13 @@ operators = {
   "+": lambda a, b: a + b
 }
 
-operator_priority_list = ["root", "+", "-", "*", "/"]
+ROOT = 0
+PAREN = 1
+
+operator_priority_list = [ROOT, "+", "-", "*", "/"]
+
+def valuefy(tree): #DEBUGGING ONLY
+  return tree.value if tree.value not in [ROOT, PAREN] else ["ROOT", "PAREN"][tree.value]
 
 class Stack:
   #Fields
@@ -110,7 +116,7 @@ class TreeNode:
     return new_child
   
   def replaceChild(self, to_remove, to_add):
-    new_node = TreeNode(to_add, self, self.paren_depth)
+    new_node = TreeNode(to_add, self, to_remove.paren_depth)
     for i in range(0, len(self.children)):
       if self.children[i] is to_remove:
         # Snip the addition in here and kick out the unwanted child.
@@ -120,10 +126,21 @@ class TreeNode:
     return new_node
 
   def toString(self):
-    strung_array = []
-    for child in self.children:
-      strung_array.append(child.toString())
-    return "%s: [%s]" % (self.value, ", ".join(strung_array))
+    if len(self.children) == 0:
+      return self.value if self.value not in [ROOT, PAREN] else ""
+    else:
+      strung_array = []
+      for child in self.children:
+        strung_array.append(child.toString())
+      if self.value in [ROOT, PAREN]:
+        return " ".join(strung_array)
+      else:
+        return "(%s %s)" % (self.value, " ".join(strung_array))
+  def root(self): #DEBUGGING ONLY
+    if (self.value == ROOT):
+      return self
+    else:
+      return self.parent.root()
 
 def hasPriority(o1, o2):
   for operator in operator_priority_list:
@@ -169,33 +186,35 @@ def parse (text, indentation):
           latest_token = character if character != ' ' else ''
       tokenization.append(latest_token)
 
-      print tokenization
-
-      tree = TreeNode("root", None, 0)
+      tree = TreeNode(ROOT, None, 0)
       current_paren_depth = 0
 
       # Parse the tokenization
       last_token = None
       for token in tokenization:
+        print "%s has paren_depth %d" % (token, current_paren_depth)
         if last_token is not None and last_token.isalnum() and token.isalnum():
           tree.manner = 1 # Signify that this is a function call node
-          tree.birth(token, current_paren_depth)
+          tree = tree.birth(token, current_paren_depth)
         elif token == '(':
+          tree = tree.birth(PAREN, current_paren_depth)
           current_paren_depth += 1
         elif token == ')':
           current_paren_depth -= 1
         else:
           strung_child = None
-          while (tree.paren_depth < current_paren_depth) or (tree.paren_depth == current_paren_depth and (not hasPriority(tree.value, token)) and (not (tree.manner == 1))):
+          while (tree.paren_depth > current_paren_depth) or (tree.paren_depth == current_paren_depth and (not hasPriority(tree.value, token)) and (not (tree.manner == 1))):
+            print "(%s deferred %s for priority reasons)" % (token, tree.value)
             strung_child = tree
             tree = tree.parent
           if strung_child is not None:
-            print "Stringing"
+            print "Stringing %s between %s and %s" % (token, valuefy(tree), valuefy(strung_child))
             tree = tree.replaceChild(strung_child, token)
           else:
-            print "Not stringing, so birthing directly to %s." % tree.value
+            print "Birthing %s to %s." % (token, valuefy(tree))
             tree = tree.birth(token, current_paren_depth)
         last_token = token
+        print "Tree is now:\n  %s" % tree.root().toString()
       while tree.parent is not None:
         tree = tree.parent
       block.append(tree)
