@@ -3,107 +3,107 @@
     <link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'/>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
-      $(function()  {
+      $(function () {
         var buttons = [],
-            root_expanded,
-            root_button = $("div#root").click(function() {
-              if (!root_expanded) {
-                root_button.addClass("dialogged");
-                setTimeout(function() {
-          $("#root_dialog").show();
-          nbname.select();
-        }, 300);
-                root_expanded = true;
-              }
-            }),
-            button_list = $("div#button_list"),
-            log = $("div#log"),
-            create_button = $("button#create").click(function() {
-              var new_button_obj, new_button, nindex = buttons.length;
-              buttons.push(new_button_obj = {
-                "name": nbname.val(),
-                "commands": nbcmd.val()
-              });
-              root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
-                interpretation = interpret(new_button_obj.commands);
-                for (var i = 0; i < interpretation.length; i += 1) {
-                  log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "] " + new_button_obj.commands.split('\n')[i]);
-                  log.append(log_div);
-                  log_div[0].scrollIntoView(false);
-                  $.ajax({
-                    url: "http://130.64.94.79:8080/execute?" + interpretation[i], /*error: function(blah, err, log_div) {
+          root_expanded,
+          root_button = $("div#root").click(function () {
+            if (!root_expanded) {
+              root_button.addClass("dialogged");
+              setTimeout(function () {
+                $("#root_dialog").show();
+                nbname.select();
+              }, 300);
+              root_expanded = true;
+            }
+          }),
+          button_list = $("div#button_list"),
+          log = $("div#log"),
+          create_button = $("button#create").click(function () {
+            var new_button_obj, new_button, nindex = buttons.length;
+            buttons.push(new_button_obj = {
+              "name": nbname.val(),
+              "commands": nbcmd.val()
+            });
+            root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
+              interpretation = interpret(new_button_obj.commands);
+              for (var i = 0; i < interpretation.length; i += 1) {
+                log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "] " + new_button_obj.commands.split('\n')[i]);
+                log.append(log_div);
+                log_div[0].scrollIntoView(false);
+                $.ajax({
+                  url: "http://130.64.94.79:8080/execute?" + interpretation[i],
+                  /*error: function(blah, err, log_div) {
                       if (err == 'error') log_div.append($('<div>').addClass('indented').text("couldn't connect"));
                     }(log_div),*/
-                    dataType: "json",
-                    success: (function(log_div) {
-                      return function(response) {
-                        log_div.append($('<div>').addClass('indented').text(response.success ? "Success" : "Failure"));
-                      }
-                    }(log_div))
-                  });
-                }
-              })).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
-                if (new_button.children('.button_dialog').css('display') == 'none') {
-                  new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val(new_button_obj.name);
-                  new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val(new_button_obj.commands);
-                  if (new_button.children('.button_title').text() == '') new_button.addClass('bdialogged');
-                  else new_button.addClass('adialogged');
-                  new_button.children('.edit').text('C').attr('title', 'Cancel');
-                  new_button.children('.run').css('opacity', '0');
-                  setTimeout(function() {
-                    new_button.children('.button_dialog').show();
-                  }, 300);
-                }
-                else {
-                  new_button.removeClass('adialogged');
-                  new_button.removeClass('bdialogged');
-                  new_button.children('.edit').text('E').attr('title', 'Edit');
-                  new_button.children('.run').css('opacity', '100');
-                  new_button.children('.button_dialog').hide();
-                }
-              })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
-                new_button.remove();
-                buttons.splice(nindex, 1);
-              })).append($('<div>').addClass('button_title').text(new_button_obj.name)).append($('<div>').addClass('init_hidden').addClass('button_dialog').html('<div class="field_wrapper">Name: <input class="field" class="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" class="button_new_commands"></textarea></div>').append($('<button>').addClass('field').text('done').click(function() {
-                new_button_obj.name = new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val();
-        new_button.children('.button_title').text(new_button_obj.name);
-                new_button_obj.commands = new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val();
-                new_button.attr('title', new_button_obj.commands);
+                  dataType: "json",
+                  success: (function (log_div) {
+                    return function (response) {
+                      log_div.append($('<div>').addClass('indented').text(response.success ? "Success" : "Failure"));
+                    }
+                  }(log_div))
+                });
+              }
+            })).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function () {
+              if (new_button.children('.button_dialog').css('display') == 'none') {
+                new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val(new_button_obj.name);
+                new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val(new_button_obj.commands);
+                if (new_button.children('.button_title').text() == '') new_button.addClass('bdialogged');
+                else new_button.addClass('adialogged');
+                new_button.children('.edit').text('C').attr('title', 'Cancel');
+                new_button.children('.run').css('opacity', '0');
+                setTimeout(function () {
+                  new_button.children('.button_dialog').show();
+                }, 301);
+              } else {
                 new_button.removeClass('adialogged');
                 new_button.removeClass('bdialogged');
                 new_button.children('.edit').text('E').attr('title', 'Edit');
                 new_button.children('.run').css('opacity', '100');
                 new_button.children('.button_dialog').hide();
-              }))));
-              root_button.removeClass("dialogged");
-              $("#root_dialog").hide();
-              nbname.val(""); nbcmd.val("");
-              setTimeout(function() {
-        root_expanded = false;
-        }, 0);
-            }),
-            cancel_button = $("button#cancel").click(function() {
-              root_button.removeClass("dialogged");
-              $("#root_dialog").hide();
-              nbname.val("");
-        nbcmd.val("");
-              setTimeout(function() {
-        root_expanded = false;
-        }, 0);
-            }),
-            nbname = $("#new_button_name"),
-            nbcmd = $("#new_button_commands");
+              }
+            })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function () {
+              new_button.remove();
+              buttons.splice(nindex, 1);
+            })).append($('<div>').addClass('button_title').text(new_button_obj.name)).append($('<div>').addClass('init_hidden').addClass('button_dialog').html('<div class="field_wrapper">Name: <input class="field" class="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" class="button_new_commands"></textarea></div>').append($('<button>').addClass('field').text('done').click(function () {
+              new_button_obj.name = new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val();
+              new_button.children('.button_title').text(new_button_obj.name);
+              new_button_obj.commands = new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val();
+              new_button.attr('title', new_button_obj.commands);
+              new_button.removeClass('adialogged');
+              new_button.removeClass('bdialogged');
+              new_button.children('.edit').text('E').attr('title', 'Edit');
+              new_button.children('.run').css('opacity', '100');
+              new_button.children('.button_dialog').hide();
+            }))));
+            root_button.removeClass("dialogged");
+            $("#root_dialog").hide();
+            nbname.val("");
+            nbcmd.val("");
+            setTimeout(function () {
+              root_expanded = false;
+            }, 0);
+          }),
+          cancel_button = $("button#cancel").click(function () {
+            root_button.removeClass("dialogged");
+            $("#root_dialog").hide();
+            nbname.val("");
+            nbcmd.val("");
+            setTimeout(function () {
+              root_expanded = false;
+            }, 0);
+          }),
+          nbname = $("#new_button_name"),
+          nbcmd = $("#new_button_commands");
 
         function interpret(commands) {
           var lines = commands.split("\n"),
-              rarray = [];
+            rarray = [];
           for (var i = 0; i < lines.length; i += 1) {
             var index, key, srarray = [];
             srarray.push("command=" + encodeURIComponent(lines[i].slice(0, index = lines[i].indexOf(" "))));
             if (index === -1) {
               rarray.push("command=" + encodeURIComponent(lines[i]));
-            }
-            else {
+            } else {
               params = lines[i].slice(index + 1).split(", ");
               for (var x = 0; x < params.length; x += 1) {
                 key = params[x].slice(0, index = params[x].indexOf(" "));
@@ -115,138 +115,194 @@
           }
           return rarray;
         }
-        $('button#clearconsole').click(function() {
+        $('button#clearconsole').click(function () {
           log.html('');
+        });
+        $('button#cleareditor').click(function () {
+          editor.setValue('');
+        });
+        $('button#newebutton').click(function () {
+          $('div#root').addClass('dialogged');
+          setTimeout(function () {
+            $('#root_dialog').show();
+            $('#new_button_name').select();
+          }, 300);
+          root_expanded = true;
+          $('#new_button_commands').val(editor.getValue());
         });
       })
     </script>
     <style>
-      body, html {
-        margin: 0px;
-        padding: 0px;
-        background: #EEE;
+      body,html
+      {
+        background:#EEE;
         overflow:hidden;
-        font-family:'Lato', 'Verdana', 'Arial', sans-serif;
+        font-family:Lato, Verdana, Arial, sans-serif;
+        margin:0;
+        padding:0;
       }
-      div.blockish {
+
+      div.blockish
+      {
         position:absolute;
       }
-      div.blockish#left_wrap {
-        left:0px;
-        top:0px;
-        bottom:0px;
+
+      div.blockish#left_wrap
+      {
+        left:0;
+        top:0;
+        bottom:0;
         width:350px;
-        box-shadow:1px 0px 1px #888 inset;
+        box-shadow:1px 0 1px #888 inset;
       }
-      div.blockish#right_wrap {
-        top:0px;
-        bottom:0px;
-        right:0px;
+
+      div.blockish#right_wrap
+      {
+        top:0;
+        bottom:0;
+        right:0;
         left:350px;
         border-left:1px solid #888;
         overflow:auto;
       }
-      div#left_wrap {
+
+      div#left_wrap
+      {
         background:#FFF;
         overflow:auto;
       }
-      div.button {
+
+      div.button
+      {
         height:50px;
         line-height:50px;
         cursor:pointer;
-        padding:10px;
         font-size:20px;
-        border-bottom: 1px solid #888;
-        box-shadow: 1px 0px 1px #888 inset;
-        transition: background 0.3s ease-in, height 0.3s ease-in, color 0.3s ease-in;
-        color: #000;
+        border-bottom:1px solid #888;
+        box-shadow:1px 0 1px #888 inset;
+        transition:background .3s ease-in, height .3s ease-in, color .3s ease-in;
+        color:#000;
+        padding:10px;
       }
-      div.button:nth-of-type(odd) {
+
+      div.button:nth-of-type(odd)
+      {
         background:#EEE;
       }
-      div.button:nth-of-type(even) {
+
+      div.button:nth-of-type(even)
+      {
         background:#CCC;
       }
-      div.button:nth-of-type(odd):hover {
+
+      div.button:nth-of-type(odd):hover
+      {
         background:#DDD;
       }
-      div.button:nth-of-type(even):hover {
+
+      div.button:nth-of-type(even):hover
+      {
         background:#BBB;
       }
-      div.button#root {
+
+      div.button#root
+      {
         background:#FFF;
       }
-      div.button#root:hover {
+
+      div.button#root:hover
+      {
         color:#710001;
       }
-      div.button#root.dialogged {
+
+      div.button#root.dialogged
+      {
         height:300px;
         cursor:auto;
         color:#000;
         overflow:auto;
       }
-      .init_hidden {
+
+      .init_hidden
+      {
         display:none;
       }
-      input.field {
+
+      input.field
+      {
         height:30px;
         width:200px;
         line-height:30px;
-        font-family:'Lato', 'Verdana', 'Arial', sans-serif;
+        font-family:Lato, Verdana, Arial, sans-serif;
         font-size:15px;
         border:1px solid #888;
-        transition:box-shadow 0.3s ease-in;
+        transition:box-shadow .3s ease-in;
         outline:none;
       }
-      input.field:focus {
-        box-shadow: 0 0 2px #888 inset;
+
+      input.field:focus
+      {
+        box-shadow:0 0 2px #888 inset;
       }
-      button.field {
+
+      button.field
+      {
         background:#710000;
-        font-family:'Lato', 'Verdana', 'Arial', sans-serif;
-        color: #FFF;
-        font-size: 12px;
-        line-height: 20px;
-        text-transform: uppercase;
+        font-family:Lato, Verdana, Arial, sans-serif;
+        color:#FFF;
+        font-size:12px;
+        line-height:20px;
+        text-transform:uppercase;
         cursor:hand;
-        border: 1px solid #000;
-        transition: background 0.3s ease-in;
+        border:1px solid #000;
+        transition:background .3s ease-in;
       }
-      button.field:hover, button.field:focus {
-        background:#F00;
-      }
-      div#button_list {
+
+      div#button_list
+      {
         left:0;
         right:0;
         top:70px;
-        bottom:0px;
-        transition:top 0.3s ease-in;
+        bottom:0;
+        transition:top .3s ease-in;
       }
-      div.running#button_list {
+
+      div.running#button_list
+      {
         top:320px;
       }
-      span.prompt {
+
+      span.prompt
+      {
         width:50px;
       }
-      div#root_dialog {
+
+      div#root_dialog
+      {
         font-size:17px;
       }
-      textarea.field {
+
+      textarea.field
+      {
         border:1px solid #888;
         width:100%;
         height:100px;
-        font-family: monospace;
+        font-family:monospace;
         outline:none;
         resize:none;
       }
-      div.blockish#big_wrapper {
+
+      div.blockish#big_wrapper
+      {
         top:0;
         bottom:0;
         right:0;
         left:0;
         overflow:auto;
       }
-      div.console {
+
+      div.console
+      {
         top:0;
         bottom:0;
         right:0;
@@ -254,142 +310,152 @@
         position:absolute;
         padding:5px;
       }
-      div.indented {
+
+      div.indented
+      {
         padding-left:10px;
       }
-      div.monospace {
+
+      div.monospace
+      {
         font-family:'Courier New';
         font-size:13px;
         white-space:pre;
       }
-      button.delete {
+
+      button.delete
+      {
         position:absolute;
         right:9px;
         width:30px;
         height:30px;
       }
-      button.delete:hover {
-        background:#F00;
-      }
-      button.edit {
+
+      button.edit
+      {
         position:absolute;
         right:48px;
         width:30px;
         height:30px;
         background:#007100;
       }
-      button.edit:hover {
-        background:#0F0;
-      }
-      button.run {
+
+      button.run
+      {
         position:absolute;
         right:87px;
         width:30px;
         height:30px;
         background:#000071;
-        transition:opacity 0.3s ease-in;
+        transition:opacity .3s ease-in;
       }
-      button.run:hover {
+
+      button.run:hover
+      {
         background:#00F;
       }
-      div.adialogged {
+
+      div.adialogged
+      {
         height:300px;
         background:#FFF;
         overflow:auto;
       }
-      div.bdialogged {
+
+      div.bdialogged
+      {
         height:250px;
         background:#FFF;
         overflow:auto;
       }
-      div.filleditorheader {
-        position:relative;
-        top:0px;
-        left:0px;
-        width:100%;
-        height:25px;
-        background:#EEE;
-      }
-      div.editorheader {
-        font-size:20px;
-        font-family:'Lato';
-        position:relative;
-        top:0px;
-        left:0px;
-        width:100%;
-        height:45px;
-        border-bottom:1px solid #888;
-        text-align:center;
-        background:#EEE;
-      }
-      div.fillconsoleheader {
-        position:relative;
-        top:0px;
-        left:0px;
-        width:100%;
-        height:25px;
-        background:#EEE;
-      }
-      div.consoleheader {
-        font-size:20px;
-        font-family:'Lato';
-        position:relative;
-        top:0px;
-        left:0px;
-        width:100%;
-        height:45px;
-        border-bottom:1px solid #888;
-        text-align:center;
-        background:#EEE;
-      }
-      div#log {
+
+      div#log
+      {
         position:absolute;
         top:70px;
         bottom:0;
         width:100%;
         overflow:auto;
       }
-      div#editor_wrap {
-        top:0px;
+
+      div#editor_wrap
+      {
+        top:0;
         bottom:50%;
         width:100%;
         background:#FFF;
       }
-      div#editor {
+
+      div#editor
+      {
         top:71px;
-        bottom:0px;
-        left:0px;
-        right:0px;
+        bottom:0;
+        left:0;
+        right:0;
       }
-      div#console {
+
+      div#console
+      {
         border-top:1px solid #888;
         top:50%;
-        bottom:0px;
+        bottom:0;
         width:100%;
         background:#FFF;
       }
-      button#clearconsole, button#cleareditor {
+
+      button#clearconsole,button#cleareditor
+      {
         position:absolute;
         top:-20px;
         right:5px;
         width:30px;
         height:30px;
-        background:#000071;
+        background:#710000;
       }
-    button#newebutton {
+
+      button#newebutton
+      {
         position:absolute;
         top:-20px;
         right:40px;
         width:30px;
         height:30px;
-        background:#703800;
+        background:#007100;
       }
-      button#clearconsole:hover, button#cleareditor:hover {
-        background:#00F;
+
+      button.field:hover,button.field:focus,button.delete:hover,button#clearconsole:hover,button#cleareditor:hover
+      {
+        background:red;
       }
-    button#newebutton:hover {
-    background:#FF8000;
-    }
+
+      button.edit:hover,button#newebutton:hover
+      {
+        background:#0F0;
+      }
+
+      div.filleditorheader,div.fillconsoleheader
+      {
+        position:relative;
+        top:0;
+        left:0;
+        width:100%;
+        height:25px;
+        background:#EEE;
+      }
+
+      div.editorheader,div.consoleheader
+      {
+        font-size:20px;
+        font-family:Lato;
+        position:relative;
+        top:0;
+        left:0;
+        width:100%;
+        height:45px;
+        border-bottom:1px solid #888;
+        text-align:center;
+        background:#EEE;
+      }
     </style>
   </head>
   <body>
