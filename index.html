@@ -204,31 +204,7 @@
       {
         background:#BBB;
       }
-<<<<<<< HEAD
       .init_hidden {
-=======
-
-      div.button#root
-      {
-        background:#FFF;
-      }
-
-      div.button#root:hover
-      {
-        color:#710001;
-      }
-
-      div.button#root.dialogged
-      {
-        height:300px;
-        cursor:auto;
-        color:#000;
-        overflow:auto;
-      }
-
-      .init_hidden
-      {
->>>>>>> 0c46db19685d4d5bf853bc8dd1e966057d7ac79f
         display:none;
       }
 
@@ -280,18 +256,7 @@
       {
         width:50px;
       }
-<<<<<<< HEAD
       textarea.field {
-=======
-
-      div#root_dialog
-      {
-        font-size:17px;
-      }
-
-      textarea.field
-      {
->>>>>>> 0c46db19685d4d5bf853bc8dd1e966057d7ac79f
         border:1px solid #888;
         width:100%;
         height:100px;
@@ -330,7 +295,6 @@
         font-size:13px;
         white-space:pre;
       }
-<<<<<<< HEAD
       button.delete {
       	position:absolute;
       	right:9px;
@@ -501,142 +465,6 @@
 	  	button#cancelbutton:hover {
 	  		background:#F00;
 	  	}
-=======
-
-      button.delete
-      {
-        position:absolute;
-        right:9px;
-        width:30px;
-        height:30px;
-      }
-
-      button.edit
-      {
-        position:absolute;
-        right:48px;
-        width:30px;
-        height:30px;
-        background:#007100;
-      }
-
-      button.run
-      {
-        position:absolute;
-        right:87px;
-        width:30px;
-        height:30px;
-        background:#000071;
-        transition:opacity .3s ease-in;
-      }
-
-      button.run:hover
-      {
-        background:#00F;
-      }
-
-      div.adialogged
-      {
-        height:300px;
-        background:#FFF;
-        overflow:auto;
-      }
-
-      div.bdialogged
-      {
-        height:250px;
-        background:#FFF;
-        overflow:auto;
-      }
-
-      div#log
-      {
-        position:absolute;
-        top:70px;
-        bottom:0;
-        width:100%;
-        overflow:auto;
-      }
-
-      div#editor_wrap
-      {
-        top:0;
-        bottom:50%;
-        width:100%;
-        background:#FFF;
-      }
-
-      div#editor
-      {
-        top:71px;
-        bottom:0;
-        left:0;
-        right:0;
-      }
-
-      div#console
-      {
-        border-top:1px solid #888;
-        top:50%;
-        bottom:0;
-        width:100%;
-        background:#FFF;
-      }
-
-      button#clearconsole,button#cleareditor
-      {
-        position:absolute;
-        top:-20px;
-        right:5px;
-        width:30px;
-        height:30px;
-        background:#710000;
-      }
-
-      button#newebutton
-      {
-        position:absolute;
-        top:-20px;
-        right:40px;
-        width:30px;
-        height:30px;
-        background:#007100;
-      }
-
-      button.field:hover,button.field:focus,button.delete:hover,button#clearconsole:hover,button#cleareditor:hover
-      {
-        background:red;
-      }
-
-      button.edit:hover,button#newebutton:hover
-      {
-        background:#0F0;
-      }
-
-      div.filleditorheader,div.fillconsoleheader
-      {
-        position:relative;
-        top:0;
-        left:0;
-        width:100%;
-        height:25px;
-        background:#EEE;
-      }
-
-      div.editorheader,div.consoleheader
-      {
-        font-size:20px;
-        font-family:Lato;
-        position:relative;
-        top:0;
-        left:0;
-        width:100%;
-        height:45px;
-        border-bottom:1px solid #888;
-        text-align:center;
-        background:#EEE;
-      }
->>>>>>> 0c46db19685d4d5bf853bc8dd1e966057d7ac79f
     </style>
   </head>
   <body>
@@ -650,7 +478,6 @@
         </div>
       </div>
       <div class="blockish" id="right_wrap">
-<<<<<<< HEAD
       	<div class="blockish" id="editor_wrap">
       		<div class="filleditorheader"></div>
       		<div class="editorheader">
@@ -678,43 +505,6 @@
       			<button id="clearconsole" class="field" title="Clear">C</button>
       		</div>
         	<div class="monospace" id="log"></div>
-=======
-        <div class="blockish" id="editor_wrap">
-          <div class="filleditorheader"></div>
-          <div class="editorheader">
-        Editor
-        <button id="newebutton" class="field" title="New button from editor">N</button>
-        <button id="cleareditor" class="field" title="Clear">C</button>
-      </div>
-      <div id="editor" class="blockish"></div>
-      <script src="src-noconflict/ace.js"></script>
-      <script>
-        var editor = ace.edit("editor");
-        editor.setTheme("ace/theme/github");
-        editor.getSession().setMode("ace/mode/javascript");
-        editor.getSession().setTabSize(2);
-        $('button#cleareditor').click(function() {
-          editor.setValue('');
-        });
-        $('button#newebutton').click(function() {
-          console.log('Clicked');
-          $('div#root').addClass('dialogged');
-          setTimeout(function() {
-            $('#root_dialog').show();
-            $('#new_button_name').select();
-          }, 300);
-          $('#new_button_commands').val(editor.getValue());
-        });
-      </script>
-        </div>
-        <div class="blockish" id="console">
-          <div class="fillconsoleheader"></div>
-          <div class="consoleheader">
-            Console
-            <button id="clearconsole" class="field" title="Clear">C</button>
-          </div>
-          <div class="monospace" id="log"></div>
->>>>>>> 0c46db19685d4d5bf853bc8dd1e966057d7ac79f
         </div>
       </div>
     </div>
