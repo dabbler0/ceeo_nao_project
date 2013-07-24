@@ -10,6 +10,12 @@ import re
 ROOT = 0
 PAREN = 1
 
+NORMAL_MANNER = 0
+FUNCTION_CALL_MANNER = 1
+OPERANT_MANNER = 2
+WHILE_MANNER = 3
+CONDITIONAL_MANNER = 4
+
 operator_priority_list = [ROOT, "=", "==", "+", "-", "*", "/"]
 
 def valuefy(tree): #DEBUGGING ONLY
@@ -55,18 +61,37 @@ class Expression:
     self.value = value
   
   def evaluate(self, closure):
-    if self.manner == 0 or self.manner == 1: # Constant
+    if self.manner == 0: # Constant
       return self.value
-    elif self.manner == 2: # Variable dereference or function call
-      deref = closure.looup(self.value[1])
-      if isinstance(deref, Function):
-        return deref.call(self.value[1])
+    elif self.manner == 1: # Variable dereference or function call
+      deref = closure.lookup(self.value[0])
+      if isinstance(deref, Function) or isinstance(deref, NativeFunction): # If the variable is a function, call it on its arguments
+        args = []
+        for arg in self.value[1]:
+          print arg.value
+          args.append(arg.evaluate(closure))
+        return deref.call(args)
       else:
-        return deref
-    elif self.manner == 3: # Definition
+        return deref # Otherwise, return the value of the variable.
+    elif self.manner == 2: # Definition
       closure.set(self.value[0], self.value[1].evaluate(closure))
-    elif self.manner == 4: # Function construction
+    elif self.manner == 3: # Function construction
       closure.set(self.value[0], Function(closure, self.value[1], self.value[2]))
+    elif self.manner == 4: # Loop
+      while (self.value[0].evaluate(closure)):
+        print "Looping"
+        for line in self.value[1]:
+          print line.evaluate(closure)
+      return None
+    elif self.manner == 5: # Conditional
+      result = None
+      if (self.value[0].evaluate(closure)): # The condition succeeds
+        for line in self.value[1]:
+          result = line.evaluate(closure)
+      elif (self.value[1] is not None): # The condition did not succeed, but there is an "else"
+        for line in self.value[1]:
+          result = line.evaluate(closure)
+      return result
 
 class Function:
   arguments = []
@@ -96,15 +121,16 @@ class NativeFunction:
     self.function = function
 
   def call(self, args):
-    return function(args)
+    return self.function(args)
 
 # The global scope, which to begin with contains the native functions.
 global_scope = Stack(None, state = {
-  "+": lambda (a, b): a + b,
-  "-": lambda (a, b): a - b,
-  "*": lambda (a, b): a * b,
-  "/": lambda (a, b): a / b,
-  "%": lambda (a, b): a % b
+  "+": NativeFunction(lambda (a, b): a + b),
+  "-": NativeFunction(lambda (a, b): a - b),
+  "*": NativeFunction(lambda (a, b): a * b),
+  "/": NativeFunction(lambda (a, b): a / b),
+  "%": NativeFunction(lambda (a, b): a % b),
+  "==": NativeFunction(lambda (a, b): a == b)
 })
 
 ##########
@@ -125,13 +151,13 @@ class TreeNode:
     self.manner = manner
     self.children = []
   
-  def birth(self, value, paren_depth):
-    new_child = TreeNode(value, self, paren_depth)
+  def birth(self, value, paren_depth, manner = 0):
+    new_child = TreeNode(value, self, paren_depth, manner = manner)
     self.children.append(new_child)
     return new_child
   
-  def replaceChild(self, to_remove, to_add):
-    new_node = TreeNode(to_add, self, to_remove.paren_depth)
+  def replaceChild(self, to_remove, to_add, manner = 0):
+    new_node = TreeNode(to_add, self, to_remove.paren_depth, manner = manner)
     for i in range(0, len(self.children)):
       if self.children[i] is to_remove:
         self.children[i] = new_node
@@ -164,14 +190,15 @@ def hasPriority(o1, o2):
       return False
   return None
 
-def parse (text, indentation):
+def parse (lines, indentation):
   # Parse a program into a list of parse trees.
-  lines = text.split("\n")
   block = []
   current_index = 0
   current_parent_depth = 0
 
   for line in lines:
+    print lines
+    print "Parsing %s." % line
     # Determine the indentation of this line.
     old_length = len(line)
     new_line = line.lstrip()
@@ -182,8 +209,12 @@ def parse (text, indentation):
       return (block, lines[current_index:])
 
     elif (indent > indentation):
+      current_index -= 1
+      print "Indented."
       # They indented, so we recurse.
-      (block[current_index][1], lines) = parse(text[current_index:], indent) # Here we hang the parsed stuff as a block on the last parsed statement.
+      print current_index, len(lines), block[current_index]
+      (block[current_index][1], lines) = parse(lines[current_index:], indent) # Here we hang the parsed stuff as a block on the last parsed statement.
+      print "Parsed as %r." % block[current_index][1]
     
     else:
       tokenization = []
@@ -208,20 +239,27 @@ def parse (text, indentation):
           # If we're supposed to, also begin constructing the next token.
           latest_token = character if character != ' ' else ''
 
-      # Append the last token to the tokennization
+      # Append the last token to the tokenization
       tokenization.append(latest_token)
-
+      
       # Begin constructing the parse tree
-      tree = TreeNode(ROOT, None, 0)
+      if tokenization[0] == "while":
+        tokenization.pop(0)
+        tree = TreeNode(ROOT, None, 0, manner = WHILE_MANNER)
+      else:
+        tree = TreeNode(ROOT, None, 0)
       current_paren_depth = 0
-
+      
       # Parse the tokenization
       last_token = None
       for token in tokenization:
         
+        # DEBUGGING
+        # print "Token: %s" % token
+
         if last_token is not None and last_token.isalnum() and token.isalnum():
           # Two consecutive alphanumeric sequences can only be a function call
-          tree.manner = 1 # Signify that this is a function call node
+          tree.manner = FUNCTION_CALL_MANNER # Signify that this is a function call node
           tree = tree.birth(token, current_paren_depth)
 
         elif token == ",":
@@ -246,55 +284,65 @@ def parse (text, indentation):
         else:
           # Otherwise, we have an atomic or operant token.
           strung_child = None # This will be for in case we have insert our node between two others
-          
+          new_manner = OPERANT_MANNER if token in operator_priority_list else NORMAL_MANNER
+
           while (tree.paren_depth > current_paren_depth) or (tree.paren_depth == current_paren_depth and (not hasPriority(tree.value, token)) and (not (tree.manner == 1))):
+            # DEBUGGING
+            # print "  deferring %s." % valuefy(tree)
+            
             # Travel up the tree until we find the node we want to be beneath
             strung_child = tree
             tree = tree.parent
 
           if strung_child is not None:
             # Insert our node between two others
-            tree = tree.replaceChild(strung_child, token)
+            tree = tree.replaceChild(strung_child, token, manner = new_manner)
           
           else:
             # Make our node (a leaf)
-            tree = tree.birth(token, current_paren_depth)
+            tree = tree.birth(token, current_paren_depth, manner = new_manner)
         
         # Update last_token
         last_token = token
-      
+        # DEBUGGING
+        # print tree.root().toString()
+      current_index += 1
       # Seek the root node of our tree and append it to our list of parsed lines
-      block.append(tree.root())
+      block.append([tree.root(),None,None])
   return (block, [])
 
-if __name__ == "__main__":
-  (lines,throw_away) = parse(raw_input(), 0)
-  for line in lines:
-    print line.toString()
-"""
-def jsonConvertLine(line):
-  if isinstance(line, int):
-    return Expression(0, line)
-  elif issinstance(line, str):
-    return Expression(2, line)
-  elif line[0] in operators:
-    return Expression(4, (line[0], jsonConvertLine(line[1]), jsonConvertLine(line[2])))
-  elif line[0] == "defun":
-    return Expression(6, (line[1], line[2], jsonConvert(line[3])))
+def expressionize(tree):
+  if tree.value == PAREN or tree.value == ROOT:
+    return expressionize(tree.children[0])
+  elif tree.manner == 1 or tree.manner == 2:
+    f_args = []
+    for child in tree.children:
+      f_args.append(expressionize(child))
+    return Expression(1, (tree.value, f_args))
+  elif tree.manner == 0:
+    if tree.value.isdigit():
+      return Expression(0, int(tree.value))
+    else:
+      return Expression(0, tree.value)
+
+def lineParse(line):
+  tree = line[0]
+  if tree.value == ROOT and tree.manner == WHILE_MANNER:
+    return Expression(4, (expressionize(tree.children[0]), line[1]))
+  elif tree.value == ROOT and tree.manner == CONDITIONAL_MANNER:
+    return Expression(4, (expressionize(tree.children[0]), line[1], line[2]))
   else:
-    return Expression(3, (line[0], line[1:]))
+    return expressionize(tree)
 
-def jsonConvert(json):
-  expressions = []
-  for line in json:
-    expressions.append(jsonConvertLine(line))
-  return expressions
+def fullParse(text):
+  parsed = parse(text.split("\n"), 0)[0]
+  block = []
+  for line in parsed:
+    print line[0].toString()
+    block.append(lineParse(line))
+  return block
 
-def jsonRun(expressions):
-  global_closure = Stack(None)
-  rval = None
-  for exp in expressions:
-    rval = exp.evaluate(global_closure)
-    print rval
-  return rval
-"""
+if __name__ == "__main__":
+  lines = fullParse(open(raw_input()).read())
+  for line in lines:
+    print line.evaluate(global_scope)

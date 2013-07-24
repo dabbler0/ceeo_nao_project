@@ -42,6 +42,13 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       self.send_header("Content-type", "text/html")
       self.end_headers()
       self.wfile.write(index_file.read())
+    if path[1] == "src-noconflict":
+      rfile = open("/".join(path[1:]))
+      self.send_response(200)
+      self.send_header("Content-type", "text/plain")
+      self.end_headers()
+      self.wfile.write(rfile.read())
+      rfile.close()
     elif path[1] == "execute":
       """
         Execute a command, described in the query string arguments.
