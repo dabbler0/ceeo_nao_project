@@ -87,13 +87,9 @@
 									if (err == 'error') log_div.append($('<div>').addClass('indented').text("couldn't connect"));
 								}(log_div),*/
 								dataType: "json",
-								response: (function(log_div) {
-									return function(server_response) {
-										log_div.append($('<div>').addClass('indented').text(server_response.response));
-									}
-								}(log_div)),
 								success: (function(log_div) {
 									return function(server_response) {
+										log_div.append($('<div>').addClass('indented').text(server_response.response));
 										log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
 									}
 								}(log_div))
