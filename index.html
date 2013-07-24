@@ -3,7 +3,7 @@
     <link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'/>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
-      $(function()  {
+      $(function () {
         var buttons = [],
         	root_button = $("div#root"),
         	log = $("div#log"),
@@ -11,14 +11,13 @@
 
         function interpret(commands) {
           var lines = commands.split("\n"),
-              rarray = [];
+            rarray = [];
           for (var i = 0; i < lines.length; i += 1) {
             var index, key, srarray = [];
             srarray.push("command=" + encodeURIComponent(lines[i].slice(0, index = lines[i].indexOf(" "))));
             if (index === -1) {
               rarray.push("command=" + encodeURIComponent(lines[i]));
-            }
-            else {
+            } else {
               params = lines[i].slice(index + 1).split(", ");
               for (var x = 0; x < params.length; x += 1) {
                 key = params[x].slice(0, index = params[x].indexOf(" "));
@@ -30,9 +29,22 @@
           }
           return rarray;
         }
-        $('button#clearconsole').click(function() {
-        	log.html('');
+        $('button#clearconsole').click(function () {
+          log.html('');
         });
+        $('button#cleareditor').click(function () {
+          editor.setValue('');
+        });
+        $('button#newebutton').click(function () {
+          $('div#root').addClass('dialogged');
+          setTimeout(function () {
+            $('#root_dialog').show();
+            $('#new_button_name').select();
+          }, 300);
+          root_expanded = true;
+          $('#new_button_commands').val(editor.getValue());
+        });
+<<<<<<< HEAD
         $('button#cleareditor').click(function() {
 					editor.setValue('');
 				});
@@ -119,135 +131,209 @@
 					$('button#cleareditor').show();
 					$('button#newebutton').show();
 				});
+=======
+>>>>>>> 0c46db19685d4d5bf853bc8dd1e966057d7ac79f
       })
     </script>
     <style>
-      body, html {
-        margin: 0px;
-        padding: 0px;
-        background: #EEE;
+      body,html
+      {
+        background:#EEE;
         overflow:hidden;
-        font-family:'Lato', 'Verdana', 'Arial', sans-serif;
+        font-family:Lato, Verdana, Arial, sans-serif;
+        margin:0;
+        padding:0;
       }
-      div.blockish {
+
+      div.blockish
+      {
         position:absolute;
       }
-      div.blockish#left_wrap {
-        left:0px;
-        top:0px;
-        bottom:0px;
+
+      div.blockish#left_wrap
+      {
+        left:0;
+        top:0;
+        bottom:0;
         width:350px;
-        box-shadow:1px 0px 1px #888 inset;
+        box-shadow:1px 0 1px #888 inset;
       }
-      div.blockish#right_wrap {
-        top:0px;
-        bottom:0px;
-        right:0px;
+
+      div.blockish#right_wrap
+      {
+        top:0;
+        bottom:0;
+        right:0;
         left:350px;
         border-left:1px solid #888;
         overflow:auto;
       }
-      div#left_wrap {
+
+      div#left_wrap
+      {
         background:#FFF;
         overflow:auto;
       }
-      div.button {
+
+      div.button
+      {
         height:50px;
         line-height:50px;
         cursor:pointer;
-        padding:10px;
         font-size:20px;
-        border-bottom: 1px solid #888;
-        box-shadow: 1px 0px 1px #888 inset;
-        transition: background 0.3s ease-in, height 0.3s ease-in, color 0.3s ease-in;
-        color: #000;
+        border-bottom:1px solid #888;
+        box-shadow:1px 0 1px #888 inset;
+        transition:background .3s ease-in, height .3s ease-in, color .3s ease-in;
+        color:#000;
+        padding:10px;
       }
-      div.button:nth-of-type(odd) {
+
+      div.button:nth-of-type(odd)
+      {
         background:#EEE;
       }
-      div.button:nth-of-type(even) {
-      	background:#CCC;
+
+      div.button:nth-of-type(even)
+      {
+        background:#CCC;
       }
-      div.button:nth-of-type(odd):hover {
+
+      div.button:nth-of-type(odd):hover
+      {
         background:#DDD;
       }
-      div.button:nth-of-type(even):hover {
-      	background:#BBB;
+
+      div.button:nth-of-type(even):hover
+      {
+        background:#BBB;
       }
+<<<<<<< HEAD
       .init_hidden {
+=======
+
+      div.button#root
+      {
+        background:#FFF;
+      }
+
+      div.button#root:hover
+      {
+        color:#710001;
+      }
+
+      div.button#root.dialogged
+      {
+        height:300px;
+        cursor:auto;
+        color:#000;
+        overflow:auto;
+      }
+
+      .init_hidden
+      {
+>>>>>>> 0c46db19685d4d5bf853bc8dd1e966057d7ac79f
         display:none;
       }
-      input.field {
+
+      input.field
+      {
         height:30px;
         width:200px;
         line-height:30px;
-        font-family:'Lato', 'Verdana', 'Arial', sans-serif;
+        font-family:Lato, Verdana, Arial, sans-serif;
         font-size:15px;
         border:1px solid #888;
-        transition:box-shadow 0.3s ease-in;
+        transition:box-shadow .3s ease-in;
         outline:none;
       }
-      input.field:focus {
-        box-shadow: 0 0 2px #888 inset;
+
+      input.field:focus
+      {
+        box-shadow:0 0 2px #888 inset;
       }
-      button.field {
+
+      button.field
+      {
         background:#710000;
-        font-family:'Lato', 'Verdana', 'Arial', sans-serif;
-        color: #FFF;
-        font-size: 12px;
-        line-height: 20px;
-        text-transform: uppercase;
+        font-family:Lato, Verdana, Arial, sans-serif;
+        color:#FFF;
+        font-size:12px;
+        line-height:20px;
+        text-transform:uppercase;
         cursor:hand;
-        border: 1px solid #000;
-        transition: background 0.3s ease-in;
+        border:1px solid #000;
+        transition:background .3s ease-in;
       }
-      button.field:hover, button.field:focus {
-        background:#F00;
-      }
-      div#button_list {
+
+      div#button_list
+      {
         left:0;
         right:0;
         top:70px;
-        bottom:0px;
-        transition:top 0.3s ease-in;
+        bottom:0;
+        transition:top .3s ease-in;
       }
-      div.running#button_list {
+
+      div.running#button_list
+      {
         top:320px;
       }
-      span.prompt {
+
+      span.prompt
+      {
         width:50px;
       }
+<<<<<<< HEAD
       textarea.field {
+=======
+
+      div#root_dialog
+      {
+        font-size:17px;
+      }
+
+      textarea.field
+      {
+>>>>>>> 0c46db19685d4d5bf853bc8dd1e966057d7ac79f
         border:1px solid #888;
         width:100%;
         height:100px;
-        font-family: monospace;
+        font-family:monospace;
         outline:none;
         resize:none;
       }
-      div.blockish#big_wrapper {
+
+      div.blockish#big_wrapper
+      {
         top:0;
         bottom:0;
         right:0;
         left:0;
         overflow:auto;
       }
-      div.console {
-      	top:0;
-      	bottom:0;
-      	right:0;
+
+      div.console
+      {
+        top:0;
+        bottom:0;
+        right:0;
         left:0;
-      	position:absolute;
+        position:absolute;
         padding:5px;
       }
-      div.indented {
+
+      div.indented
+      {
         padding-left:10px;
       }
-      div.monospace {
-      	font-family:'Courier New';
-      	font-size:13px;
+
+      div.monospace
+      {
+        font-family:'Courier New';
+        font-size:13px;
         white-space:pre;
       }
+<<<<<<< HEAD
       button.delete {
       	position:absolute;
       	right:9px;
@@ -418,6 +504,142 @@
 	  	button#cancelbutton:hover {
 	  		background:#F00;
 	  	}
+=======
+
+      button.delete
+      {
+        position:absolute;
+        right:9px;
+        width:30px;
+        height:30px;
+      }
+
+      button.edit
+      {
+        position:absolute;
+        right:48px;
+        width:30px;
+        height:30px;
+        background:#007100;
+      }
+
+      button.run
+      {
+        position:absolute;
+        right:87px;
+        width:30px;
+        height:30px;
+        background:#000071;
+        transition:opacity .3s ease-in;
+      }
+
+      button.run:hover
+      {
+        background:#00F;
+      }
+
+      div.adialogged
+      {
+        height:300px;
+        background:#FFF;
+        overflow:auto;
+      }
+
+      div.bdialogged
+      {
+        height:250px;
+        background:#FFF;
+        overflow:auto;
+      }
+
+      div#log
+      {
+        position:absolute;
+        top:70px;
+        bottom:0;
+        width:100%;
+        overflow:auto;
+      }
+
+      div#editor_wrap
+      {
+        top:0;
+        bottom:50%;
+        width:100%;
+        background:#FFF;
+      }
+
+      div#editor
+      {
+        top:71px;
+        bottom:0;
+        left:0;
+        right:0;
+      }
+
+      div#console
+      {
+        border-top:1px solid #888;
+        top:50%;
+        bottom:0;
+        width:100%;
+        background:#FFF;
+      }
+
+      button#clearconsole,button#cleareditor
+      {
+        position:absolute;
+        top:-20px;
+        right:5px;
+        width:30px;
+        height:30px;
+        background:#710000;
+      }
+
+      button#newebutton
+      {
+        position:absolute;
+        top:-20px;
+        right:40px;
+        width:30px;
+        height:30px;
+        background:#007100;
+      }
+
+      button.field:hover,button.field:focus,button.delete:hover,button#clearconsole:hover,button#cleareditor:hover
+      {
+        background:red;
+      }
+
+      button.edit:hover,button#newebutton:hover
+      {
+        background:#0F0;
+      }
+
+      div.filleditorheader,div.fillconsoleheader
+      {
+        position:relative;
+        top:0;
+        left:0;
+        width:100%;
+        height:25px;
+        background:#EEE;
+      }
+
+      div.editorheader,div.consoleheader
+      {
+        font-size:20px;
+        font-family:Lato;
+        position:relative;
+        top:0;
+        left:0;
+        width:100%;
+        height:45px;
+        border-bottom:1px solid #888;
+        text-align:center;
+        background:#EEE;
+      }
+>>>>>>> 0c46db19685d4d5bf853bc8dd1e966057d7ac79f
     </style>
   </head>
   <body>
@@ -431,6 +653,7 @@
         </div>
       </div>
       <div class="blockish" id="right_wrap">
+<<<<<<< HEAD
       	<div class="blockish" id="editor_wrap">
       		<div class="filleditorheader"></div>
       		<div class="editorheader">
@@ -458,6 +681,43 @@
       			<button id="clearconsole" class="field" title="Clear">C</button>
       		</div>
         	<div class="monospace" id="log"></div>
+=======
+        <div class="blockish" id="editor_wrap">
+          <div class="filleditorheader"></div>
+          <div class="editorheader">
+        Editor
+        <button id="newebutton" class="field" title="New button from editor">N</button>
+        <button id="cleareditor" class="field" title="Clear">C</button>
+      </div>
+      <div id="editor" class="blockish"></div>
+      <script src="src-noconflict/ace.js"></script>
+      <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/github");
+        editor.getSession().setMode("ace/mode/javascript");
+        editor.getSession().setTabSize(2);
+        $('button#cleareditor').click(function() {
+          editor.setValue('');
+        });
+        $('button#newebutton').click(function() {
+          console.log('Clicked');
+          $('div#root').addClass('dialogged');
+          setTimeout(function() {
+            $('#root_dialog').show();
+            $('#new_button_name').select();
+          }, 300);
+          $('#new_button_commands').val(editor.getValue());
+        });
+      </script>
+        </div>
+        <div class="blockish" id="console">
+          <div class="fillconsoleheader"></div>
+          <div class="consoleheader">
+            Console
+            <button id="clearconsole" class="field" title="Clear">C</button>
+          </div>
+          <div class="monospace" id="log"></div>
+>>>>>>> 0c46db19685d4d5bf853bc8dd1e966057d7ac79f
         </div>
       </div>
     </div>
