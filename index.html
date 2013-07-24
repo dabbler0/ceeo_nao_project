@@ -30,13 +30,15 @@
           return rarray;
         }
         $('button#clearconsole').click(function () {
-        	$('div.shader').show();
-        	$('div.confirmation').show();
-        	$('button#confirm').click(function() {
-        		log.html('');
-        		$('div.confirmation').hide();
-        		$('div.shader').hide();
-        	});
+        	if (log.children().length != 0) {
+        		$('div.shader').show();
+        		$('div.confirmation').show();
+        		$('button#confirm').click(function() {
+        			log.html('');
+        			$('div.confirmation').hide();
+        			$('div.shader').hide();
+        		});
+        	}
         });
         $('button#newebutton').click(function () {
           $('div#root').addClass('dialogged');
@@ -48,13 +50,15 @@
           $('#new_button_commands').val(editor.getValue());
         });
         $('button#cleareditor').click(function() {
-        	$('div.shader').show();
-        	$('div.confirmation').show();
-        	$('button#confirm').click(function() {
-        		editor.setValue('');
-        		$('div.confirmation').hide();
-						$('div.shader').hide();
-        	});
+        	if (editor.getValue() != '') {
+        		$('div.shader').show();
+        		$('div.confirmation').show();
+        		$('button#confirm').click(function() {
+        			editor.setValue('');
+        			$('div.confirmation').hide();
+							$('div.shader').hide();
+        		});
+        	}
 				});
 				$('button#newebutton').click(function() {
 					$('button#cleareditor').hide();
