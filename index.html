@@ -30,10 +30,13 @@
           return rarray;
         }
         $('button#clearconsole').click(function () {
-          log.html('');
-        });
-        $('button#cleareditor').click(function () {
-          editor.setValue('');
+        	$('div.shader').show();
+        	$('div.confirmation').show();
+        	$('button#confirm').click(function() {
+        		log.html('');
+        		$('div.confirmation').hide();
+        		$('div.shader').hide();
+        	});
         });
         $('button#newebutton').click(function () {
           $('div#root').addClass('dialogged');
@@ -45,7 +48,13 @@
           $('#new_button_commands').val(editor.getValue());
         });
         $('button#cleareditor').click(function() {
-					editor.setValue('');
+        	$('div.shader').show();
+        	$('div.confirmation').show();
+        	$('button#confirm').click(function() {
+        		editor.setValue('');
+        		$('div.confirmation').hide();
+						$('div.shader').hide();
+        	});
 				});
 				$('button#newebutton').click(function() {
 					$('button#cleareditor').hide();
@@ -100,8 +109,14 @@
 							new_button.children('.button_dialog').hide();
 						}
 					})).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
-						new_button.remove();
-						buttons.splice(nindex, 1);
+						$('div.shader').show();
+						$('div.confirmation').show();
+						$('button#confirm').click(function() {
+							new_button.remove();
+							buttons.splice(nindex, 1);
+							$('div.confirmation').hide();
+							$('div.shader').hide();
+						});
 					})).append($('<div>').addClass('button_title').text(new_button_obj.name)).append($('<div>').addClass('init_hidden').addClass('button_dialog').html('<div class="field_wrapper">Name: <input class="field" class="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" class="button_new_commands"></textarea></div>').append($('<button>').addClass('field').text('done').click(function() {
 						new_button_obj.name = new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val();
 						new_button.children('.button_title').text(new_button_obj.name);
@@ -129,6 +144,10 @@
 					$('button#savebutton').hide();
 					$('button#cleareditor').show();
 					$('button#newebutton').show();
+				});
+				$('button#deny').click(function() {
+					$('div.confirmation').hide();
+					$('div.shader').hide();
 				});
       })
     </script>
@@ -222,7 +241,7 @@
 
       input.field:focus
       {
-        box-shadow:0 0 2px #888 inset;
+        box-shadow:0px 0px 2px #888 inset;
       }
 
       button.field
@@ -409,6 +428,7 @@
       	background:#FFF;
       }
       div#editor {
+      	z-index:0;
       	top:71px;
       	bottom:0px;
       	left:0px;
@@ -465,6 +485,52 @@
 	  	button#cancelbutton:hover {
 	  		background:#F00;
 	  	}
+	  	div.shader {
+	  		position:fixed;
+	  		top:0px;
+	  		left:0px;
+	  		right:0px;
+	  		bottom:0px;
+	  		background:rgba(100, 100, 100, 0.7)
+	  	}
+	  	div.confirmation {
+	  		font-size:20px;
+	  		position:absolute;
+	  		width:200px;
+	  		height:200px;
+	  		top:50%;
+	  		left:50%;
+	  		margin-top:-100px;
+	  		margin-left:-100px;
+	  		text-align:center;
+	  		box-shadow:0px 0px 2px 2px #444;
+	  		background:#FFF;
+	  	}
+	  	button#confirm {
+	  		position:absolute;
+	  		top:150px;
+	  		left:20px;
+	  		width:30px;
+	  		height:30px;
+	  		background:#007100;
+	  	}
+	  	button#confirm:hover {
+	  		background:#0F0;
+	  	}
+	  	button#deny {
+	  		position:absolute;
+	  		top:150px;
+	  		right:20px;
+	  		width:30px;
+	  		height:30px;
+	  	}
+	  	button#deny:hover {
+	  		background:#F00;
+	  	}
+	  	span.confirmtext {
+	  		position:relative;
+	  		top:65px;
+	  	}
     </style>
   </head>
   <body>
@@ -506,6 +572,12 @@
       		</div>
         	<div class="monospace" id="log"></div>
         </div>
+      </div>
+      <div class="shader init_hidden"></div>
+      <div class="confirmation init_hidden">
+      	<span class="confirmtext">Really?</span>
+      	<button id="confirm" class="field" title="Yes">Y</button>
+      	<button id="deny" class="field" title="No">N</button>
       </div>
     </div>
   </body>
