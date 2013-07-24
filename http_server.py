@@ -43,7 +43,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       self.send_response(200)
       self.send_header("Content-type", "text/html")
       self.end_headers()
-      self.wfile.write(index_file.read().replace('130.64.94.79', ip_address))
+      self.wfile.write(index_file.read())
     if path[1] == "src-noconflict":
       rfile = open("/".join(path[1:]))
       self.send_response(200)

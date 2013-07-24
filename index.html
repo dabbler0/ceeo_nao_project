@@ -83,7 +83,7 @@
 							log.append(log_div);
 							log_div[0].scrollIntoView(false);
 							$.ajax({
-								url: "http://130.64.94.79:8080/execute?" + interpretation[i], /*error: function(blah, err, log_div) {
+								url: "/execute?" + interpretation[i], /*error: function(blah, err, log_div) {
 									if (err == 'error') log_div.append($('<div>').addClass('indented').text("couldn't connect"));
 								}(log_div),*/
 								dataType: "json",
@@ -164,7 +164,7 @@
 						log.append(log_div);
 						log_div[0].scrollIntoView(false);
 						$.ajax({
-							url: "http://130.64.94.79:8080/execute?" + interpretation[i], /*error: function(blah, err, log_div) {
+							url: "/execute?" + interpretation[i], /*error: function(blah, err, log_div) {
 								if (err == 'error') log_div.append($('<div>').addClass('indented').text("couldn't connect"));
 							}(log_div),*/
 							dataType: "json",
