@@ -39,13 +39,20 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     
     print path
 
-    if len(path) < 2 or path[1] == '' or path[1] == "index.html":
+    if len(path) < 2 or path[1] == '' or path[1] == 'index.html':
       index_file = open("index.html")
       self.send_response(200)
       self.send_header("Content-type", "text/html")
       self.end_headers()
       self.wfile.write(index_file.read())
-    if path[1] == "src-noconflict":
+    elif path[len(path) - 1] == 'favicon.ico':
+      if len(path) == 2: favicon_file = open('favicon.ico')
+      else: favicon_file = open('favicondark.ico')
+      self.send_response(200)
+      seld.send_header("Content-type", "image/x-icon")
+      self.end_headers()
+      self.wfile.write(favicon_file.read())
+    elif path[1] == "src-noconflict":
       rfile = open("/".join(path[1:]))
       self.send_response(200)
       if path[len(path) - 1].index('.js') == -1: self.send_header("Content-type", "text/css")
