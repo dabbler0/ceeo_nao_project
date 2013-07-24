@@ -23,7 +23,7 @@ def dVFloat (dic, key, val):
   #Parse a dictionary element as a float if it exists, otherwise default to (val).
   return float(dic[key]) if key in dic else val
 
-class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
+class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
   def do_GET(self):
     #Parse the given path
     parsed = urlparse.urlparse(self.path)
@@ -45,7 +45,8 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     if path[1] == "src-noconflict":
       rfile = open("/".join(path[1:]))
       self.send_response(200)
-      self.send_header("Content-type", "text/plain")
+      if path[len(path) - 1].index('.js') == -1: self.send_header("Content-type", "text/css")
+      else: self.send_header("Content-type", "text/javascript")
       self.end_headers()
       self.wfile.write(rfile.read())
       rfile.close()
@@ -75,7 +76,7 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         #Reply with success.
         reply["success"] = True
 
-      elif qwargs["command"] == "halt":
+      elif qwargs["command"] == 'halt':
         #Tell our walk proxy to stop
         walkproxy.stopWalk()
         
@@ -123,6 +124,12 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
         #Reply with success.
         reply["success"] = True
+
+      elif qwargs["command"] == 'ping':
+        reply["response"] = "pong"
+
+        #Reply with success
+        reply["success"] = True
       
       else:
         #Otherwise, we have no idea what's going on.
@@ -166,5 +173,5 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
   print "Starting server on port 8080."
-  httpd = BaseHTTPServer.HTTPServer(('', 8080), MaoHandler)
+  httpd = BaseHTTPServer.HTTPServer(('', 8080), NaoHandler)
   httpd.serve_forever()
