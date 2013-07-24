@@ -2,6 +2,7 @@
 import BaseHTTPServer
 import urlparse
 import simplejson as json
+import math
 
 from naoqi import ALProxy
 
@@ -10,6 +11,7 @@ SAVED_COMMANDS_FILE = "commands.json"
 #Create the proxies we'll need to execute commands
 ttsproxy = ALProxy("ALTextToSpeech", "localhost", 9559)
 walkproxy = ALProxy("ALMotion", "localhost", 9559)
+netproxy = ALProxy("ALNetwork", "localhost", 9559)
 
 '''
 #These aren't needed right now but might be in the future
@@ -41,7 +43,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       self.send_response(200)
       self.send_header("Content-type", "text/html")
       self.end_headers()
-      self.wfile.write(index_file.read())
+      self.wfile.write(index_file.read().replace('130.64.94.79', ip_address))
     if path[1] == "src-noconflict":
       rfile = open("/".join(path[1:]))
       self.send_response(200)
@@ -60,7 +62,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       if qwargs["command"] == 'say':
         #Say whatever the client wanted us to
         tosay = qwargs["text"]
-        ttsproxy.post.say(tosay) #TODO maybe daemonize this, so as to respond more quickly.
+        ttsproxy.post.say(tosay)
         
         #Reply that we've said it.
         reply["success"] = True
@@ -71,7 +73,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         walkproxy.walkInit()
 
         #Walk. Turn by "turn" radians, then move fowards by "forward", right by "right" meters.
-        walkproxy.walkTo(dVFloat(qwargs, "forward", 0), dVFloat(qwargs, "right", 0), dVFloat(qwargs, "turn", 0))
+        walkproxy.walkTo(dVFloat(qwargs, "forward", 0), dVFloat(qwargs, "right", 0), dVFloat(qwargs, "turn", 0) * 180 / math.pi)
         
         #Reply with success.
         reply["success"] = True
@@ -134,7 +136,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       else:
         #Otherwise, we have no idea what's going on.
         reply["success"] = False
-        reply["error"] = "Unknown command."
+        reply["response"] = "Unknown command."
     
       self.send_response(200)
       self.send_header("Content-Type", "application/json")
@@ -172,6 +174,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     self.wfile.write(simplejson.dumps(reply))
 
 if __name__ == "__main__":
-  print "Starting server on port 8080."
+  ip_address = netproxy.getLocalIP()
+  print 'Starting server on %s:8080' % ip_address
   httpd = BaseHTTPServer.HTTPServer(('', 8080), NaoHandler)
   httpd.serve_forever()
