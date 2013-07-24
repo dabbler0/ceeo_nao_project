@@ -10,9 +10,9 @@
               if (!root_expanded) {
                 root_button.addClass("dialogged");
                 setTimeout(function() {
-					$("#root_dialog").show();
-					nbname.select();
-				}, 300);
+									$("#root_dialog").show();
+									nbname.select();
+								}, 300);
                 root_expanded = true;
               }
             }),
@@ -52,7 +52,7 @@
               	  new_button.children('.run').css('opacity', '0');
               	  setTimeout(function() {
               			new_button.children('.button_dialog').show();
-              	  }, 300);
+              	  }, 301);
               	}
               	else {
               	  new_button.removeClass('adialogged');
@@ -66,7 +66,7 @@
                 buttons.splice(nindex, 1);
               })).append($('<div>').addClass('button_title').text(new_button_obj.name)).append($('<div>').addClass('init_hidden').addClass('button_dialog').html('<div class="field_wrapper">Name: <input class="field" class="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" class="button_new_commands"></textarea></div>').append($('<button>').addClass('field').text('done').click(function() {
               	new_button_obj.name = new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val();
-				new_button.children('.button_title').text(new_button_obj.name);
+              	new_button.children('.button_title').text(new_button_obj.name);
               	new_button_obj.commands = new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val();
               	new_button.attr('title', new_button_obj.commands);
               	new_button.removeClass('adialogged');
@@ -86,10 +86,10 @@
               root_button.removeClass("dialogged");
               $("#root_dialog").hide();
               nbname.val("");
-			  nbcmd.val("");
+			  			nbcmd.val("");
               setTimeout(function() {
-				root_expanded = false;
-			  }, 0);
+								root_expanded = false;
+			  			}, 0);
             }),
             nbname = $("#new_button_name"),
             nbcmd = $("#new_button_commands");
@@ -118,6 +118,18 @@
         $('button#clearconsole').click(function() {
         	log.html('');
         });
+        $('button#cleareditor').click(function() {
+					editor.setValue('');
+				});
+				$('button#newebutton').click(function() {
+					$('div#root').addClass('dialogged');
+					setTimeout(function() {
+						$('#root_dialog').show();
+						$('#new_button_name').select();
+					}, 300);
+					root_expanded = true;
+					$('#new_button_commands').val(editor.getValue());
+				});
       })
     </script>
     <style>
@@ -374,7 +386,7 @@
       	right:5px;
       	width:30px;
       	height:30px;
-      	background:#000071;
+      	background:#710000;
       }
 	  button#newebutton {
       	position:absolute;
@@ -382,13 +394,13 @@
       	right:40px;
       	width:30px;
       	height:30px;
-      	background:#703800;
+      	background:#007100;
       }
       button#clearconsole:hover, button#cleareditor:hover {
-      	background:#00F;
+      	background:#F00;
       }
 	  button#newebutton:hover {
-		background:#FF8000;
+		background:#0F0;
 	  }
     </style>
   </head>
@@ -422,26 +434,15 @@
 				<button id="newebutton" class="field" title="New button from editor">N</button>
 				<button id="cleareditor" class="field" title="Clear">C</button>
 			</div>
-      		<div id="editor" class="blockish"></div>
+      	<div id="editor" class="blockish"></div>
       		<script src="src-noconflict/ace.js"></script>
-			<script>
-    			var editor = ace.edit("editor");
-				editor.setTheme("ace/theme/github");
-				editor.getSession().setMode("ace/mode/javascript");
-				editor.getSession().setTabSize(2);
-				$('button#cleareditor').click(function() {
-					editor.setValue('');
-				});
-				$('button#newebutton').click(function() {
-					console.log('Clicked');
-					$('div#root').addClass('dialogged');
-					setTimeout(function() {
-						$('#root_dialog').show();
-						$('#new_button_name').select();
-					}, 300);
-					$('#new_button_commands').val(editor.getValue());
-				});
-			</script>
+					<script>
+    				var editor = ace.edit("editor");
+						editor.setTheme("ace/theme/github");
+						editor.getSession().setMode("ace/mode/javascript");
+						editor.getSession().setTabSize(2);
+						editor.getSession().setUseWorker(false);
+					</script>
       	</div>
       	<div class="blockish" id="console">
       		<div class="fillconsoleheader"></div>
