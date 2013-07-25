@@ -7,7 +7,8 @@
         var buttons = [],
         	root_button = $("div#root"),
         	log = $("div#log"),
-        	button_list = $("div#button_list")
+        	button_list = $("div#button_list"),
+        	editortext
 
         function interpret(commands) {
           var lines = commands.split("\n"),
@@ -97,23 +98,47 @@
 							}(log_div))
 						});
 					})).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
-						if (new_button.children('.button_dialog').css('display') == 'none') {
-							new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val(new_button_obj.name);
-							new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val(new_button_obj.commands);
-							if (new_button.children('.button_title').text() == '') new_button.addClass('bdialogged');
-							else new_button.addClass('adialogged');
+						if (new_button.children('.edit').text() == 'E') {
+							editortext = editor.getValue();
+							$('input#new_ebutton_name').val(new_button_obj.name);
+							editor.setValue(new_button_obj.commands);
 							new_button.children('.edit').text('C').attr('title', 'Cancel');
 							new_button.children('.run').hide();
-							setTimeout(function() {
-								new_button.children('.button_dialog').show();
-							}, 301);
+							$('button#cleareditor').hide();
+					    $('button#newebutton').hide();
+					    $('button#runbutton').hide();
+					    $('button#cancelbutton').hide();
+					    $('button#savebutton').hide();
+					    $('button#donebutton').show();
+					    $('span#editortitle').hide();
+					    $('span#editor_new_name').show();
+					    $('input#new_ebutton_name').select();
+					    $('button#donebutton').click(function() {
+					      new_button_obj.name = $('input#new_ebutton_name').val();
+						    new_button.children('.button_title').text(new_button_obj.name);
+						    new_button_obj.commands = editor.getValue();
+						    new_button.attr('title', new_button_obj.commands);
+						    editor.setValue(editortext);
+						    new_button.children('.edit').text('E').attr('title', 'Edit');
+						    new_button.children('.run').show();
+						    $('input#new_ebutton_name').val('');
+							  $('span#editor_new_name').hide();
+							  $('span#editortitle').show();
+							  $('button#donebutton').hide();
+							  $('button#cleareditor').show();
+							  $('button#newebutton').show();
+							});
 						}
 						else {
-							new_button.removeClass('adialogged');
-							new_button.removeClass('bdialogged');
-							new_button.children('.edit').text('E').attr('title', 'Edit');
-							new_button.children('.run').show();
-							new_button.children('.button_dialog').hide();
+						  editor.setValue(editortext);
+						  new_button.children('.edit').text('E').attr('title', 'Edit');
+						  new_button.children('.run').show();
+						  $('input#new_ebutton_name').val('');
+						  $('span#editor_new_name').hide();
+						  $('span#editortitle').show();
+						  $('button#donebutton').hide();
+						  $('button#cleareditor').show();
+						  $('button#newebutton').show();
 						}
 					})).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
 						$('div.shader').show();
@@ -124,17 +149,7 @@
 							$('div.confirmation').hide();
 							$('div.shader').hide();
 						});
-					})).append($('<div>').addClass('button_title').text(new_button_obj.name)).append($('<div>').addClass('init_hidden').addClass('button_dialog').html('<div class="field_wrapper">Name: <input class="field" class="button_new_name"/></div><div class="field_wrapper"><div class="textarea_field_label">Commands:</div><textarea class="field" class="button_new_commands"></textarea></div>').append($('<button>').addClass('field').text('done').click(function() {
-						new_button_obj.name = new_button.children('.button_dialog').children('div.field_wrapper').eq(0).children('input.field').val();
-						new_button.children('.button_title').text(new_button_obj.name);
-						new_button_obj.commands = new_button.children('.button_dialog').children('div.field_wrapper').eq(1).children('textarea.field').val();
-						new_button.attr('title', new_button_obj.commands);
-						new_button.removeClass('adialogged');
-						new_button.removeClass('bdialogged');
-						new_button.children('.edit').text('E').attr('title', 'Edit');
-						new_button.children('.run').show();
-						new_button.children('.button_dialog').hide();
-					}))));
+					})).append($('<div>').addClass('button_title').text(new_button_obj.name)));
 					$('input#new_ebutton_name').val('');
 					$('span#editor_new_name').hide();
 					$('span#editortitle').show();
@@ -373,12 +388,12 @@
       	background:#00F;
       }
       div.adialogged {
-      	height:300px;
+      	height:150px;
       	background:#FFF;
       	overflow:auto;
       }
       div.bdialogged {
-      	height:250px;
+      	height:100px;
       	background:#FFF;
       	overflow:auto;
       }
@@ -508,12 +523,19 @@
       	width:30px;
       	height:30px;
       	background:#000071;
-      	transition:opacity .3s ease-in;
+      }
+      button#donebutton {
+      	position:absolute;
+      	top:-16px;
+      	right:9px;
+      	width:30px;
+      	height:30px;
+      	background:#007100;
       }
       button#clearconsole:hover, button#cleareditor:hover, button#cancelbutton:hover {
       	background:#F00;
       }
-	  	button#newebutton:hover, button#savebutton:hover {
+	  	button#newebutton:hover, button#savebutton:hover, button#donebutton:hover {
 				background:#0F0;
 	  	}
 	  	button#runbutton:hover {
@@ -583,10 +605,11 @@
       		<div class="editorheader">
 						<span id="editortitle">Editor</span>
 						<span class="init_hidden" id = "editor_new_name">Name: <input id="new_ebutton_name" class="field"/></span>
+						<button id="donebutton" class="field init_hidden" title="Done">D</button>
 						<button id="savebutton" class="field init_hidden" title="Save">S</button>
 						<button id="cancelbutton" class="field init_hidden" title="Cancel">C</button>
 						<button id="runbutton" class="field" title="Run">R</button>
-						<button id="newebutton" class="field" title="New button from editor">N</button>
+						<button id="newebutton" class="field" title="New button">N</button>
 						<button id="cleareditor" class="field" title="Clear">C</button>
 					</div>
       		<div id="editor" class="blockish"></div>

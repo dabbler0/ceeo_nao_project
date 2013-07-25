@@ -12,12 +12,12 @@ SAVED_COMMANDS_FILE = "commands.json"
 #Create the proxies we'll need to execute commands
 ttsproxy = ALProxy("ALTextToSpeech", "localhost", 9559)
 walkproxy = ALProxy("ALMotion", "localhost", 9559)
+bmproxy = ALProxy("ALBehaviorManager", "localhost", 9559)
 netproxy = ALProxy("ALNetwork", "localhost", 9559)
 
 '''
 #These aren't needed right now but might be in the future
 
-bmproxy = ALProxy("ALBehaviorManager", "localhost", 9559)
 adproxy = ALProxy("ALAudioDevice", "localhost", 9559)
 
 '''
@@ -45,13 +45,14 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       self.send_header("Content-type", "text/html")
       self.end_headers()
       self.wfile.write(index_file.read())
+      index_file.close()
     elif path[len(path) - 1] == 'favicon.ico':
-      if len(path) == 2: favicon_file = open('favicon.ico')
-      else: favicon_file = open('favicondark.ico')
+      favicon_file = open('favicon.ico')
       self.send_response(200)
-      seld.send_header("Content-type", "image/x-icon")
+      self.send_header("Content-type", "image/x-icon")
       self.end_headers()
       self.wfile.write(favicon_file.read())
+      favicon_file.close()
     elif path[1] == "src-noconflict":
       rfile = open("/".join(path[1:]))
       self.send_response(200)
@@ -160,7 +161,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     elif path[1] == 'getbuttons':
       buttonsfile = open('buttons.txt')
       self.send_response(200)
-      self.send_header("Content-Type", "text/plain")
+      self.send_header("Content-Type", "application.json")
       self.end_headers()
       self.wfile.write(buttonsfile.read())
       buttonfile.close()
