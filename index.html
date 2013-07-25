@@ -116,8 +116,8 @@
               $.ajax({
               	method: 'POST',
               	url: '/setbutton',
-              	data {
-              		'data': {'name': new_button_obj.name, 'delete': true}
+              	data: {
+              		'data': JSON.stringify({'name': new_button_obj.name, 'delete': true})
               	},
               	dataType: 'json'
               });
