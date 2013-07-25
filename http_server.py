@@ -185,13 +185,15 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       wfile.close()
       reply["success"] = True
     if path[1] == "code":
-      code = urllib.unquote(urlparse.parse_qs(self.wfile.read())["code"][0])
-      lines = interpreter.fullParse(code.read())
+      length = int(self.headers.getheader('content-length'))
+      postvars = urlparse.parse_qs(self.rfile.read(length), keep_blank_values=1)
+      code = urllib.unquote(postvars["code"][0])
+      lines = interpreter.fullParse(code)
       for line in lines:
-        interpreter.line.evaluate(global_scope)
+        line.evaluate(interpreter.global_scope)
       reply["success"] = True
     elif path[1] == 'setbutton':
-      buttondata = urllib.unquote(self.rfile.read()).replace('+', ' ')
+      buttondata = urllib.unquote(self.rfile.read(int(self.headers.getheader('content-length')), keep_blank_values=1)).replace('+', ' ')
       reply["success"] = True
       buttonsfile = open('buttons.txt')
       contents = buttonsfile.read()
