@@ -157,10 +157,15 @@ class NativeFunction:
   def call(self, args):
     return self.function(args)
 
-def walk ((x,)):
+def walk (l):
+  x = None
+  if len(l) > 0:
+    x = l[0]
+  else:
+    x = 1
   walkproxy.stiffnessInterpolation("Body", 1, 0.1)
   walkproxy.walkInit()
-  walkproxy.walkTo(x, 0, 0)
+  walkproxy.walkTo(x / 10.0, 0, 0)
   return True
 
 def turn ((x,)):
