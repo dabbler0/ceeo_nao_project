@@ -41,7 +41,7 @@
               method: 'POST',
               url: '/code',
               data: {
-                'data': JSON.stringify({'code': editor.getValue()})
+                'data': JSON.stringify({'code': new_button_obj.commands})
               },
               dataType: 'json',
               success: (function(log_div) {
@@ -57,6 +57,10 @@
               editortext = editor.getValue();
               $('input#new_ebutton_name').val(new_button_obj.name);
               editor.setValue(new_button_obj.commands);
+              var editbuttons = $('.edit');
+              for (var i = 0; i < editbuttons.length; i++) {
+                if (editbuttons.eq(i).text() == 'C') editbuttons.eq(i).click();
+              }
               new_button.children('.edit').text('C').attr('title', 'Cancel');
               new_button.children('.run').hide();
               $('button#cleareditor').hide();
@@ -199,13 +203,12 @@
           datatype: 'json',
           success: (function() {
             return function(server_response) {
-              buttonsjson = server_reponse;
-              console.log(buttonsjson);
-              for key in buttonsjson {
+              buttonsjson = server_response;
+              for (key in buttonsjson) {
                 createbutton({'name': key, 'commands': buttonsjson[key]});
               }
             }
-          })
+          }())
         });
       })
     </script>
