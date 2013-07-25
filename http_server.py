@@ -188,10 +188,13 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       length = int(self.headers.getheader('content-length'))
       postvars = urlparse.parse_qs(self.rfile.read(length), keep_blank_values=1)
       code = urllib.unquote(postvars["code"][0])
+      log = []
+      interpreter.resetGlobalScope(log)
       lines = interpreter.fullParse(code)
       for line in lines:
         line.evaluate(interpreter.global_scope)
       reply["success"] = True
+      reply["response"] = "\n".join(log)
     elif path[1] == 'setbutton':
       buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values=1)["data"][0].replace('+', ' ')))
       buttonsfile = open('buttons.json')
