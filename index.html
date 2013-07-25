@@ -86,6 +86,14 @@
                 new_button.children('.button_title').text(new_button_obj.name);
                 new_button_obj.commands = editor.getValue();
                 new_button.attr('title', new_button_obj.commands);
+                $.ajax({
+									method: 'POST',
+									url: '/setbutton',
+									data: {
+										'data': JSON.stringify({"name": new_button_obj.name, "commands": new_button_obj.commands, "delete": false})
+									},
+									dataType: "json"
+								});
                 editor.setValue(editortext);
                 new_button.children('.edit').text('E').attr('title', 'Edit');
                 new_button.children('.run').show();
