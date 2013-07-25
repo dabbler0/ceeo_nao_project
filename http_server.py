@@ -197,7 +197,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       reply["success"] = True
       reply["response"] = "\n".join(log)
     elif path[1] == 'setbutton':
-      buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values=1)["data"][0].replace('+', ' ')))
+      buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values=1)["data"][0]))
       buttonsfile = open('buttons.json')
       contents = json.load(buttonsfile)
       buttonsfile.close()
