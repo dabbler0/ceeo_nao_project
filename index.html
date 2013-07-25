@@ -41,7 +41,7 @@
               method: 'POST',
               url: '/code',
               data: {
-                'data': JSON.stringify({'code': editor.getValue()})
+                'data': JSON.stringify({'code': new_button_obj.commands})
               },
               dataType: 'json',
               success: (function(log_div) {
@@ -199,13 +199,12 @@
           datatype: 'json',
           success: (function() {
             return function(server_response) {
-              buttonsjson = server_reponse;
-              console.log(buttonsjson);
-              for key in buttonsjson {
+              buttonsjson = server_response;
+              for (key in buttonsjson) {
                 createbutton({'name': key, 'commands': buttonsjson[key]});
               }
             }
-          })
+          }())
         });
       })
     </script>
