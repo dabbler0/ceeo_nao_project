@@ -181,6 +181,7 @@
         });
         $('button#savebutton').click(function() {
           createbutton({'name': $('input#new_ebutton_name').val(), 'commands': editor.getValue()});
+          editor.setValue('');
         });
         $('button#cancelbutton').click(function() {
           $('input#new_ebutton_name').val('');
