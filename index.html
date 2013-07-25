@@ -105,6 +105,14 @@
             $('button#confirm').click(function() {
               new_button.remove();
               buttons.splice(nindex, 1);
+              $.ajax({
+              	method: 'POST',
+              	url: '/setbutton',
+              	data {
+              		'data': {'name': new_button_obj.name, 'delete': true}
+              	},
+              	dataType: 'json'
+              });
               $('div.confirmation').hide();
               $('div.shader').hide();
             });
