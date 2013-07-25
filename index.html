@@ -33,6 +33,14 @@
         function createbutton(new_button_obj) {
           var new_button_obj, new_button, nindex = buttons.length;
           buttons.push(new_button_obj);
+          $.ajax({
+            method: 'POST',
+            url: '/setbutton',
+            data: {
+              'data': JSON.stringify({"name": new_button_obj.name, "commands": new_button_obj.commands, "delete": false})
+            },
+            dataType: "json"
+          })
           root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
             log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
             log.append(log_div);
@@ -41,7 +49,7 @@
               method: 'POST',
               url: '/code',
               data: {
-                'data': JSON.stringify({'code': new_button_obj.commands})
+                'code': new_button_obj.commands
               },
               dataType: 'json',
               success: (function(log_div) {
@@ -129,15 +137,6 @@
               $('div.shader').hide();
             });
           }
-        });
-        $('button#newebutton').click(function () {
-          $('div#root').addClass('dialogged');
-          setTimeout(function () {
-            $('#root_dialog').show();
-            $('#new_button_name').select();
-          }, 300);
-          root_expanded = true;
-          $('#new_button_commands').val(editor.getValue());
         });
         $('button#cleareditor').click(function() {
           if (editor.getValue() != '') {
