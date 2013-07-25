@@ -160,7 +160,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       self.wfile.write(lfile.read())
       lfile.close()
     elif path[1] == 'getbuttons':
-      buttonsfile = open('buttons.txt')
+      buttonsfile = open('buttons.json')
       self.send_response(200)
       self.send_header("Content-Type", "application.json")
       self.end_headers()
@@ -193,26 +193,30 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         line.evaluate(interpreter.global_scope)
       reply["success"] = True
     elif path[1] == 'setbutton':
-      buttondata = urllib.unquote(self.rfile.read(int(self.headers.getheader('content-length')), keep_blank_values=1)).replace('+', ' ')
-      reply["success"] = True
-      buttonsfile = open('buttons.txt')
-      contents = buttonsfile.read()
+      buttondata = json.loads(urllib.unquote(self.rfile.read(int(self.headers.getheader('content-length')), keep_blank_values=1)).replace('data=', '').replace('+', ' '))
+      buttonsfile = open('buttons.json')
+      contents = json.loads(buttonsfile.read())
       buttonsfile.close()
-      if contents.index('\n[' + buttondata['name'] + ']') == -1:
-        wbuttonsfile = open('buttons.txt', 'wa')
-        wbuttonsfile.write('[' + buttondata['name'] + '][' + buttondata['commands'] + ']\n');
-        wbuttonsfile.close()
-      else:
+      reply["success"] = False
+      if buttondata['name'] in contents:
         if buttondata['delete']:
-          startlocation = contents.index('\n[' + buttondata['name'] + ']')
-          wbuttonsfile = open('buttons.txt', 'w')
-          wbuttonsfile.write(contents[:startlocation - 1] + contents[contents.index('\n', startlocation):])
+          del(contents[buttondata['name']])
+          wbuttonsfile = open('buttons.json', 'w')
+          wbuttonsfile.write(contents)
           wbuttonsfile.close()
         else:
+          contents[buttondata['name']] = buttondata['commands']
           startlocation = contents.index('\n[' + buttondata['name'] + ']')
-          wbuttonsfile = open('buttons.txt', 'w')
-          wbuttonsfile.write(contents[:startlocation + len(buttondata['name']) + 2] + buttondata['commands'] + contents[contents.index('\n', startlocation) - 1:])
+          wbuttonsfile = open('buttons.json', 'w')
+          wbuttonsfile.write(contents)
           wbuttonsfile.close()
+        reply["success"] = True
+      else:
+        wbuttonsfile = open('buttons.json', 'w')
+        contents[buttondata['name']] = buttondata['commands']
+        wbuttonsfile.write(json.dumps(contents));
+        wbuttonsfile.close()
+        reply["success"] = True
 
     self.send_response(200)
     self.send_header("Content-Type", "application/json")
