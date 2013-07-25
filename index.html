@@ -5,10 +5,10 @@
     <script>
       $(function () {
         var buttons = [],
-        	root_button = $("div#root"),
-        	log = $("div#log"),
-        	button_list = $("div#button_list"),
-        	editortext
+          root_button = $("div#root"),
+          log = $("div#log"),
+          button_list = $("div#button_list"),
+          editortext
 
         function interpret(commands) {
           var lines = commands.split("\n"),
@@ -31,15 +31,15 @@
           return rarray;
         }
         $('button#clearconsole').click(function () {
-        	if (log.children().length != 0) {
-        		$('div.shader').show();
-        		$('div.confirmation').show();
-        		$('button#confirm').click(function() {
-        			log.html('');
-        			$('div.confirmation').hide();
-        			$('div.shader').hide();
-        		});
-        	}
+          if (log.children().length != 0) {
+            $('div.shader').show();
+            $('div.confirmation').show();
+            $('button#confirm').click(function() {
+              log.html('');
+              $('div.confirmation').hide();
+              $('div.shader').hide();
+            });
+          }
         });
         $('button#newebutton').click(function () {
           $('div#root').addClass('dialogged');
@@ -51,147 +51,147 @@
           $('#new_button_commands').val(editor.getValue());
         });
         $('button#cleareditor').click(function() {
-        	if (editor.getValue() != '') {
-        		$('div.shader').show();
-        		$('div.confirmation').show();
-        		$('button#confirm').click(function() {
-        			editor.setValue('');
-        			$('div.confirmation').hide();
-							$('div.shader').hide();
-        		});
-        	}
-				});
-				$('button#newebutton').click(function() {
-					$('button#cleareditor').hide();
-					$('button#newebutton').hide();
-					$('button#runbutton').hide();
-					$('button#cancelbutton').show()
-					$('button#savebutton').show()
-					$('span#editortitle').hide();
-					$('span#editor_new_name').show();
-					$('input#new_ebutton_name').select();
-				});
-				$('button#savebutton').click(function() {
-					var new_button_obj, new_button, nindex = buttons.length;
-					buttons.push(new_button_obj = {
-						"name": $('input#new_ebutton_name').val(),
-						"commands": editor.getValue()
-					});
-					root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
-						log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
-						log.append(log_div);
-						log_div[0].scrollIntoView(false);
-						$.ajax({
-							method: 'POST',
-							url: '/code',
-							data: {
-								'data': JSON.stringify({'code': editor.getValue()})
-							},
-							dataType: 'json',
-							success: (function(log_div) {
-								return function(server_response) {
-									log_div.append($('<div>').addClass('indented').text(server_response.response));
-									log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
-									log_div.children().last()[0].scrollIntoView(false);
-								}
-							}(log_div))
-						});
-					})).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
-						if (new_button.children('.edit').text() == 'E') {
-							editortext = editor.getValue();
-							$('input#new_ebutton_name').val(new_button_obj.name);
-							editor.setValue(new_button_obj.commands);
-							new_button.children('.edit').text('C').attr('title', 'Cancel');
-							new_button.children('.run').hide();
-							$('button#cleareditor').hide();
-					    $('button#newebutton').hide();
-					    $('button#runbutton').hide();
-					    $('button#cancelbutton').hide();
-					    $('button#savebutton').hide();
-					    $('button#donebutton').show();
-					    $('span#editortitle').hide();
-					    $('span#editor_new_name').show();
-					    $('input#new_ebutton_name').select();
-					    $('button#donebutton').click(function() {
-					      new_button_obj.name = $('input#new_ebutton_name').val();
-						    new_button.children('.button_title').text(new_button_obj.name);
-						    new_button_obj.commands = editor.getValue();
-						    new_button.attr('title', new_button_obj.commands);
-						    editor.setValue(editortext);
-						    new_button.children('.edit').text('E').attr('title', 'Edit');
-						    new_button.children('.run').show();
-						    $('input#new_ebutton_name').val('');
-							  $('span#editor_new_name').hide();
-							  $('span#editortitle').show();
-							  $('button#donebutton').hide();
-							  $('button#cleareditor').show();
-							  $('button#newebutton').show();
-							});
-						}
-						else {
-						  editor.setValue(editortext);
-						  new_button.children('.edit').text('E').attr('title', 'Edit');
-						  new_button.children('.run').show();
-						  $('input#new_ebutton_name').val('');
-						  $('span#editor_new_name').hide();
-						  $('span#editortitle').show();
-						  $('button#donebutton').hide();
-						  $('button#cleareditor').show();
-						  $('button#newebutton').show();
-						}
-					})).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
-						$('div.shader').show();
-						$('div.confirmation').show();
-						$('button#confirm').click(function() {
-							new_button.remove();
-							buttons.splice(nindex, 1);
-							$('div.confirmation').hide();
-							$('div.shader').hide();
-						});
-					})).append($('<div>').addClass('button_title').text(new_button_obj.name)));
-					$('input#new_ebutton_name').val('');
-					$('span#editor_new_name').hide();
-					$('span#editortitle').show();
-					$('button#cancelbutton').hide();
-					$('button#savebutton').hide();
-					$('button#cleareditor').show();
-					$('button#newebutton').show();
-					$('button#runbutton').show();
-				});
-				$('button#cancelbutton').click(function() {
-					$('input#new_ebutton_name').val('');
-					$('span#editor_new_name').hide();
-					$('span#editortitle').show();
-					$('button#cancelbutton').hide();
-					$('button#savebutton').hide();
-					$('button#cleareditor').show();
-					$('button#newebutton').show();
-					$('button#runbutton').show();
-				});
-				$('button#runbutton').click(function() {
-					log_div = $("<div>").addClass("log").text("[Editor]");
-					log.append(log_div);
-					log_div[0].scrollIntoView(false);
-					$.ajax({
-						method: 'POST',
-						url: '/code',
-						data: {
-							'code': editor.getValue()
-						},
-						dataType: 'json',
-						success: (function(log_div) {
-							return function(server_response) {
-								log_div.append($('<div>').addClass('indented').text(server_response.response));
-								log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
-								log_div.children().last()[0].scrollIntoView(false);
-							}
-						}(log_div))
-					});
-				});
-				$('button#deny').click(function() {
-					$('div.confirmation').hide();
-					$('div.shader').hide();
-				});
+          if (editor.getValue() != '') {
+            $('div.shader').show();
+            $('div.confirmation').show();
+            $('button#confirm').click(function() {
+              editor.setValue('');
+              $('div.confirmation').hide();
+              $('div.shader').hide();
+            });
+          }
+        });
+        $('button#newebutton').click(function() {
+          $('button#cleareditor').hide();
+          $('button#newebutton').hide();
+          $('button#runbutton').hide();
+          $('button#cancelbutton').show()
+          $('button#savebutton').show()
+          $('span#editortitle').hide();
+          $('span#editor_new_name').show();
+          $('input#new_ebutton_name').select();
+        });
+        $('button#savebutton').click(function() {
+          var new_button_obj, new_button, nindex = buttons.length;
+          buttons.push(new_button_obj = {
+            "name": $('input#new_ebutton_name').val(),
+            "commands": editor.getValue()
+          });
+          root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
+            log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
+            log.append(log_div);
+            log_div[0].scrollIntoView(false);
+            $.ajax({
+              method: 'POST',
+              url: '/code',
+              data: {
+                'data': JSON.stringify({'code': editor.getValue()})
+              },
+              dataType: 'json',
+              success: (function(log_div) {
+                return function(server_response) {
+                  log_div.append($('<div>').addClass('indented').text(server_response.response));
+                  log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
+                  log_div.children().last()[0].scrollIntoView(false);
+                }
+              }(log_div))
+            });
+          })).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
+            if (new_button.children('.edit').text() == 'E') {
+              editortext = editor.getValue();
+              $('input#new_ebutton_name').val(new_button_obj.name);
+              editor.setValue(new_button_obj.commands);
+              new_button.children('.edit').text('C').attr('title', 'Cancel');
+              new_button.children('.run').hide();
+              $('button#cleareditor').hide();
+              $('button#newebutton').hide();
+              $('button#runbutton').hide();
+              $('button#cancelbutton').hide();
+              $('button#savebutton').hide();
+              $('button#donebutton').show();
+              $('span#editortitle').hide();
+              $('span#editor_new_name').show();
+              $('input#new_ebutton_name').select();
+              $('button#donebutton').click(function() {
+                new_button_obj.name = $('input#new_ebutton_name').val();
+                new_button.children('.button_title').text(new_button_obj.name);
+                new_button_obj.commands = editor.getValue();
+                new_button.attr('title', new_button_obj.commands);
+                editor.setValue(editortext);
+                new_button.children('.edit').text('E').attr('title', 'Edit');
+                new_button.children('.run').show();
+                $('input#new_ebutton_name').val('');
+                $('span#editor_new_name').hide();
+                $('span#editortitle').show();
+                $('button#donebutton').hide();
+                $('button#cleareditor').show();
+                $('button#newebutton').show();
+              });
+            }
+            else {
+              editor.setValue(editortext);
+              new_button.children('.edit').text('E').attr('title', 'Edit');
+              new_button.children('.run').show();
+              $('input#new_ebutton_name').val('');
+              $('span#editor_new_name').hide();
+              $('span#editortitle').show();
+              $('button#donebutton').hide();
+              $('button#cleareditor').show();
+              $('button#newebutton').show();
+            }
+          })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
+            $('div.shader').show();
+            $('div.confirmation').show();
+            $('button#confirm').click(function() {
+              new_button.remove();
+              buttons.splice(nindex, 1);
+              $('div.confirmation').hide();
+              $('div.shader').hide();
+            });
+          })).append($('<div>').addClass('button_title').text(new_button_obj.name)));
+          $('input#new_ebutton_name').val('');
+          $('span#editor_new_name').hide();
+          $('span#editortitle').show();
+          $('button#cancelbutton').hide();
+          $('button#savebutton').hide();
+          $('button#cleareditor').show();
+          $('button#newebutton').show();
+          $('button#runbutton').show();
+        });
+        $('button#cancelbutton').click(function() {
+          $('input#new_ebutton_name').val('');
+          $('span#editor_new_name').hide();
+          $('span#editortitle').show();
+          $('button#cancelbutton').hide();
+          $('button#savebutton').hide();
+          $('button#cleareditor').show();
+          $('button#newebutton').show();
+          $('button#runbutton').show();
+        });
+        $('button#runbutton').click(function() {
+          log_div = $("<div>").addClass("log").text("[Editor]");
+          log.append(log_div);
+          log_div[0].scrollIntoView(false);
+          $.ajax({
+            method: 'POST',
+            url: '/code',
+            data: {
+              'code': editor.getValue()
+            },
+            dataType: 'json',
+            success: (function(log_div) {
+              return function(server_response) {
+                log_div.append($('<div>').addClass('indented').text(server_response.response));
+                log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
+                log_div.children().last()[0].scrollIntoView(false);
+              }
+            }(log_div))
+          });
+        });
+        $('button#deny').click(function() {
+          $('div.confirmation').hide();
+          $('div.shader').hide();
+        });
       })
     </script>
     <style>
@@ -357,283 +357,283 @@
         white-space:pre;
       }
       button.delete {
-      	position:absolute;
-      	right:9px;
-      	width:30px;
-      	height:30px;
+        position:absolute;
+        right:9px;
+        width:30px;
+        height:30px;
       }
       button.delete:hover {
-      	background:#F00;
+        background:#F00;
       }
       button.edit {
-      	position:absolute;
-      	right:48px;
-      	width:30px;
-      	height:30px;
-      	background:#007100;
+        position:absolute;
+        right:48px;
+        width:30px;
+        height:30px;
+        background:#007100;
       }
       button.edit:hover {
-      	background:#0F0;
+        background:#0F0;
       }
       button.run {
-      	position:absolute;
-      	right:87px;
-      	width:30px;
-      	height:30px;
-      	background:#000071;
+        position:absolute;
+        right:87px;
+        width:30px;
+        height:30px;
+        background:#000071;
       }
       button.run:hover {
-      	background:#00F;
+        background:#00F;
       }
       div.adialogged {
-      	height:150px;
-      	background:#FFF;
-      	overflow:auto;
+        height:150px;
+        background:#FFF;
+        overflow:auto;
       }
       div.bdialogged {
-      	height:100px;
-      	background:#FFF;
-      	overflow:auto;
+        height:100px;
+        background:#FFF;
+        overflow:auto;
       }
       div.fillbuttonheader {
-      	position:relative;
-      	top:0px;
-      	left:0px;
-      	width:100%;
-      	height:25px;
-      	background:#EEE;
+        position:relative;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:25px;
+        background:#EEE;
       }
       div.buttonheader {
-      	font-size:20px;
-      	font-family:'Lato';
-      	position:relative
-      	top:0px;
-      	left:0px;
-      	width:100%;
-      	height:45px;
-      	border-bottom:1px solid #888;
-      	text-align:center;
-      	background:#EEE;
+        font-size:20px;
+        font-family:'Lato';
+        position:relative
+        top:0px;
+        left:0px;
+        width:100%;
+        height:45px;
+        border-bottom:1px solid #888;
+        text-align:center;
+        background:#EEE;
       }
       div.filleditorheader {
-      	position:relative;
-      	top:0px;
-      	left:0px;
-      	width:100%;
-      	height:25px;
-      	background:#EEE;
+        position:relative;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:25px;
+        background:#EEE;
       }
       div.editorheader {
-      	font-size:20px;
-      	font-family:'Lato';
-      	position:relative;
-      	top:0px;
-      	left:0px;
-      	width:100%;
-      	height:45px;
-      	border-bottom:1px solid #888;
-      	text-align:center;
-      	background:#EEE;
+        font-size:20px;
+        font-family:'Lato';
+        position:relative;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:45px;
+        border-bottom:1px solid #888;
+        text-align:center;
+        background:#EEE;
       }
       div.fillconsoleheader {
-      	position:relative;
-      	top:0px;
-      	left:0px;
-      	width:100%;
-      	height:25px;
-      	background:#EEE;
+        position:relative;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:25px;
+        background:#EEE;
       }
       div.consoleheader {
-      	font-size:20px;
-      	font-family:'Lato';
-      	position:relative;
-      	top:0px;
-      	left:0px;
-      	width:100%;
-      	height:45px;
-      	border-bottom:1px solid #888;
-      	text-align:center;
-      	background:#EEE;
+        font-size:20px;
+        font-family:'Lato';
+        position:relative;
+        top:0px;
+        left:0px;
+        width:100%;
+        height:45px;
+        border-bottom:1px solid #888;
+        text-align:center;
+        background:#EEE;
       }
       div#log {
-      	position:absolute;
-      	top:70px;
-      	bottom:0;
-      	width:100%;
-      	overflow:auto;
+        position:absolute;
+        top:70px;
+        bottom:0;
+        width:100%;
+        overflow:auto;
       }
       div#editor_wrap {
-      	top:0px;
-      	bottom:50%;
-      	width:100%;
-      	background:#FFF;
+        top:0px;
+        bottom:50%;
+        width:100%;
+        background:#FFF;
       }
       div#editor {
-      	z-index:0;
-      	top:71px;
-      	bottom:0px;
-      	left:0px;
-      	right:0px;
+        z-index:0;
+        top:71px;
+        bottom:0px;
+        left:0px;
+        right:0px;
       }
       div#console {
-      	border-top:1px solid #888;
-      	top:50%;
-      	bottom:0px;
-      	width:100%;
-      	background:#FFF;
+        border-top:1px solid #888;
+        top:50%;
+        bottom:0px;
+        width:100%;
+        background:#FFF;
       }
       button#clearconsole, button#cleareditor {
-      	position:absolute;
-      	top:-16px;
-      	right:9px;
-      	width:30px;
-      	height:30px;
-      	background:#710000;
+        position:absolute;
+        top:-16px;
+        right:9px;
+        width:30px;
+        height:30px;
+        background:#710000;
       }
-	  	button#newebutton {
-      	position:absolute;
-      	top:-16px;
-      	right:48px;
-      	width:30px;
-      	height:30px;
-      	background:#007100;
+      button#newebutton {
+        position:absolute;
+        top:-16px;
+        right:48px;
+        width:30px;
+        height:30px;
+        background:#007100;
       }
       button#savebutton {
-      	position:absolute;
-      	top:-16px;
-      	right:48px;
-      	width:30px;
-      	height:30px;
-      	background:#007100;
+        position:absolute;
+        top:-16px;
+        right:48px;
+        width:30px;
+        height:30px;
+        background:#007100;
       }
       button#cancelbutton {
-      	position:absolute;
-      	top:-16px;
-      	right:9px;
-      	width:30px;
-      	height:30px;
-      	background:#710000;
+        position:absolute;
+        top:-16px;
+        right:9px;
+        width:30px;
+        height:30px;
+        background:#710000;
       }
       button#runbutton {
-      	position:absolute;
-      	top:-16px;
-      	right:87px;
-      	width:30px;
-      	height:30px;
-      	background:#000071;
+        position:absolute;
+        top:-16px;
+        right:87px;
+        width:30px;
+        height:30px;
+        background:#000071;
       }
       button#donebutton {
-      	position:absolute;
-      	top:-16px;
-      	right:9px;
-      	width:30px;
-      	height:30px;
-      	background:#007100;
+        position:absolute;
+        top:-16px;
+        right:9px;
+        width:30px;
+        height:30px;
+        background:#007100;
       }
       button#clearconsole:hover, button#cleareditor:hover, button#cancelbutton:hover {
-      	background:#F00;
+        background:#F00;
       }
-	  	button#newebutton:hover, button#savebutton:hover, button#donebutton:hover {
-				background:#0F0;
-	  	}
-	  	button#runbutton:hover {
-	  		background:#00F;
-	  	}
-	  	div.shader {
-	  		position:fixed;
-	  		top:0px;
-	  		left:0px;
-	  		right:0px;
-	  		bottom:0px;
-	  		background:rgba(100, 100, 100, 0.7)
-	  	}
-	  	div.confirmation {
-	  		font-size:20px;
-	  		position:absolute;
-	  		width:200px;
-	  		height:200px;
-	  		top:50%;
-	  		left:50%;
-	  		margin-top:-100px;
-	  		margin-left:-100px;
-	  		text-align:center;
-	  		box-shadow:0px 0px 2px 2px #444;
-	  		background:#FFF;
-	  	}
-	  	button#confirm {
-	  		position:absolute;
-	  		top:150px;
-	  		left:20px;
-	  		width:30px;
-	  		height:30px;
-	  		background:#007100;
-	  	}
-	  	button#confirm:hover {
-	  		background:#0F0;
-	  	}
-	  	button#deny {
-	  		position:absolute;
-	  		top:150px;
-	  		right:20px;
-	  		width:30px;
-	  		height:30px;
-	  	}
-	  	button#deny:hover {
-	  		background:#F00;
-	  	}
-	  	span.confirmtext {
-	  		position:relative;
-	  		top:65px;
-	  	}
+      button#newebutton:hover, button#savebutton:hover, button#donebutton:hover {
+        background:#0F0;
+      }
+      button#runbutton:hover {
+        background:#00F;
+      }
+      div.shader {
+        position:fixed;
+        top:0px;
+        left:0px;
+        right:0px;
+        bottom:0px;
+        background:rgba(100, 100, 100, 0.7)
+      }
+      div.confirmation {
+        font-size:20px;
+        position:absolute;
+        width:200px;
+        height:200px;
+        top:50%;
+        left:50%;
+        margin-top:-100px;
+        margin-left:-100px;
+        text-align:center;
+        box-shadow:0px 0px 2px 2px #444;
+        background:#FFF;
+      }
+      button#confirm {
+        position:absolute;
+        top:150px;
+        left:20px;
+        width:30px;
+        height:30px;
+        background:#007100;
+      }
+      button#confirm:hover {
+        background:#0F0;
+      }
+      button#deny {
+        position:absolute;
+        top:150px;
+        right:20px;
+        width:30px;
+        height:30px;
+      }
+      button#deny:hover {
+        background:#F00;
+      }
+      span.confirmtext {
+        position:relative;
+        top:65px;
+      }
     </style>
   </head>
   <body>
     <div class="blockish" id="big_wrapper">
       <div class="blockish" id="left_wrap">
         <div id="button_list">
-        	<div id="root">
-        		<div class="fillbuttonheader"></div>
-          	<div class="buttonheader">Buttons</div>
+          <div id="root">
+            <div class="fillbuttonheader"></div>
+            <div class="buttonheader">Buttons</div>
           </div>
         </div>
       </div>
       <div class="blockish" id="right_wrap">
-      	<div class="blockish" id="editor_wrap">
-      		<div class="filleditorheader"></div>
-      		<div class="editorheader">
-						<span id="editortitle">Editor</span>
-						<span class="init_hidden" id = "editor_new_name">Name: <input id="new_ebutton_name" class="field"/></span>
-						<button id="donebutton" class="field init_hidden" title="Done">D</button>
-						<button id="savebutton" class="field init_hidden" title="Save">S</button>
-						<button id="cancelbutton" class="field init_hidden" title="Cancel">C</button>
-						<button id="runbutton" class="field" title="Run">R</button>
-						<button id="newebutton" class="field" title="New button">N</button>
-						<button id="cleareditor" class="field" title="Clear">C</button>
-					</div>
-      		<div id="editor" class="blockish"></div>
-      		<script src="src-noconflict/ace.js"></script>
-					<script>
-    				var editor = ace.edit("editor");
-						editor.setTheme("ace/theme/github");
-						editor.getSession().setMode("ace/mode/javascript");
-						editor.getSession().setTabSize(2);
-						editor.getSession().setUseWorker(false);
-					</script>
-      	</div>
-      	<div class="blockish" id="console">
-      		<div class="fillconsoleheader"></div>
-      		<div class="consoleheader">
-      			Console
-      			<button id="clearconsole" class="field" title="Clear">C</button>
-      		</div>
-        	<div class="monospace" id="log"></div>
+        <div class="blockish" id="editor_wrap">
+          <div class="filleditorheader"></div>
+          <div class="editorheader">
+            <span id="editortitle">Editor</span>
+            <span class="init_hidden" id = "editor_new_name">Name: <input id="new_ebutton_name" class="field"/></span>
+            <button id="donebutton" class="field init_hidden" title="Done">D</button>
+            <button id="savebutton" class="field init_hidden" title="Save">S</button>
+            <button id="cancelbutton" class="field init_hidden" title="Cancel">C</button>
+            <button id="runbutton" class="field" title="Run">R</button>
+            <button id="newebutton" class="field" title="New button">N</button>
+            <button id="cleareditor" class="field" title="Clear">C</button>
+          </div>
+          <div id="editor" class="blockish"></div>
+          <script src="src-noconflict/ace.js"></script>
+          <script>
+            var editor = ace.edit("editor");
+            editor.setTheme("ace/theme/github");
+            editor.getSession().setMode("ace/mode/javascript");
+            editor.getSession().setTabSize(2);
+            editor.getSession().setUseWorker(false);
+          </script>
+        </div>
+        <div class="blockish" id="console">
+          <div class="fillconsoleheader"></div>
+          <div class="consoleheader">
+            Console
+            <button id="clearconsole" class="field" title="Clear">C</button>
+          </div>
+          <div class="monospace" id="log"></div>
         </div>
       </div>
       <div class="shader init_hidden"></div>
       <div class="confirmation init_hidden">
-      	<span class="confirmtext">Really?</span>
-      	<button id="confirm" class="field" title="Yes">Y</button>
-      	<button id="deny" class="field" title="No">N</button>
+        <span class="confirmtext">Really?</span>
+        <button id="confirm" class="field" title="Yes">Y</button>
+        <button id="deny" class="field" title="No">N</button>
       </div>
     </div>
   </body>

@@ -31,6 +31,8 @@ darkproxy = ALProxy("ALDarknessDetection", "localhost", 9559)
 darkproxy.subscribe("naoscript")
 sonarproxy.subscribe("naoscript")
 
+bmproxy.installBehavior("wave")
+
 memproxy = ALProxy("ALMemory", "localhost", 9559)
 
 def valuefy(tree): #DEBUGGING ONLY
@@ -168,7 +170,12 @@ def walk (l):
   walkproxy.walkTo(x / 10.0, 0, 0)
   return True
 
-def turn ((x,)):
+def turn (l):
+  x = None
+  if len(l) > 0:
+    x = l[0]
+  else:
+    x = 180
   walkproxy.stiffnessInterpolation("Body", 1, 0.1)
   walkproxy.walkInit()
   walkproxy.walkTo(0, 0, x * math.pi / 180)
@@ -192,6 +199,8 @@ global_scope = Stack(None, state = {
   "true": True,
   "false": False,
   "walk": NativeFunction(walk, name = "walk"),
+  "turn": NativeFunction(turn, name = "turn"),
+  "wave": NativeFunction(lambda l: bmproxy.runBehavior("wave"), name="wave"),
   "say": NativeFunction(lambda (x,): ttsproxy.say(str(x)), name = "say"),
   "stand": NativeFunction(lambda l: bmproxy.runBehavior("Stand Up"), name="stand"),
   "sit": NativeFunction(lambda l: bmproxy.runBehavior("Sit Down"), name="sit"),
@@ -199,6 +208,7 @@ global_scope = Stack(None, state = {
   "relax": NativeFunction(lambda l: walkproxy.stiffnessInterpolation("Body", 0, 0.1), name = "relax"),
   "volume": NativeFunction(lambda (x,): adproxy.setOutputVolume(int(commands["volume"])), name="volume"),
   "neg": NativeFunction(lambda (x,): -x, name = "neg"),
+  "backward": NativeFunction(lambda (l): -l[0] if len(l) > 0 else -1),
   "distance": NativeFunction(lambda (x,): memproxy.getData("Device/SubDeviceList/US/Left/Sensor/Value") if x == "left" else memproxy.getData("Device/SubDeviceList/US/Right/Sensor/Value"), name = "distance"),
   "brightness": NativeFunction(lambda l: 100 - (memproxy.getData("DarknessDetection/DarknessValue") * 50 / 47), name = "brightness"),
 })
