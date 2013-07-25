@@ -78,7 +78,6 @@
 						"commands": editor.getValue()
 					});
 					root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
-						interpretation = new_button_obj.commands.split('\n');
 						log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
 						log.append(log_div);
 						log_div[0].scrollIntoView(false);
@@ -86,7 +85,7 @@
 							method: 'POST',
 							url: '/code',
 							data: {
-								'data': JSON.stringify({'code': interpretation})
+								'data': JSON.stringify({'code': editor.getValue()})
 							},
 							dataType: 'json',
 							success: (function(log_div) {
@@ -170,15 +169,14 @@
 					$('button#runbutton').show();
 				});
 				$('button#runbutton').click(function() {
-					interpretation = editor.getValue().split('\n');
-					log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
+					log_div = $("<div>").addClass("log").text("[Editor]");
 					log.append(log_div);
 					log_div[0].scrollIntoView(false);
 					$.ajax({
 						method: 'POST',
 						url: '/code',
 						data: {
-							'data': JSON.stringify({'code': interpretation})
+							'code': editor.getValue()
 						},
 						dataType: 'json',
 						success: (function(log_div) {
