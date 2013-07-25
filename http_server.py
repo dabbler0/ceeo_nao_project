@@ -206,14 +206,13 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
           wbuttonsfile.close()
         else:
           contents[buttondata['name']] = buttondata['commands']
-          startlocation = contents.index('\n[' + buttondata['name'] + ']')
           wbuttonsfile = open('buttons.json', 'w')
           wbuttonsfile.write(json.dumps(contents))
           wbuttonsfile.close()
         reply["success"] = True
       else:
-        wbuttonsfile = open('buttons.json', 'w')
         contents[buttondata['name']] = buttondata['commands']
+        wbuttonsfile = open('buttons.json', 'w')
         wbuttonsfile.write(json.dumps(contents));
         wbuttonsfile.close()
         reply["success"] = True
