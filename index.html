@@ -30,53 +30,9 @@
           }
           return rarray;
         }
-        $('button#clearconsole').click(function () {
-        	if (log.children().length != 0) {
-        		$('div.shader').show();
-        		$('div.confirmation').show();
-        		$('button#confirm').click(function() {
-        			log.html('');
-        			$('div.confirmation').hide();
-        			$('div.shader').hide();
-        		});
-        	}
-        });
-        $('button#newebutton').click(function () {
-          $('div#root').addClass('dialogged');
-          setTimeout(function () {
-            $('#root_dialog').show();
-            $('#new_button_name').select();
-          }, 300);
-          root_expanded = true;
-          $('#new_button_commands').val(editor.getValue());
-        });
-        $('button#cleareditor').click(function() {
-        	if (editor.getValue() != '') {
-        		$('div.shader').show();
-        		$('div.confirmation').show();
-        		$('button#confirm').click(function() {
-        			editor.setValue('');
-        			$('div.confirmation').hide();
-							$('div.shader').hide();
-        		});
-        	}
-				});
-				$('button#newebutton').click(function() {
-					$('button#cleareditor').hide();
-					$('button#newebutton').hide();
-					$('button#runbutton').hide();
-					$('button#cancelbutton').show()
-					$('button#savebutton').show()
-					$('span#editortitle').hide();
-					$('span#editor_new_name').show();
-					$('input#new_ebutton_name').select();
-				});
-				$('button#savebutton').click(function() {
-					var new_button_obj, new_button, nindex = buttons.length;
-					buttons.push(new_button_obj = {
-						"name": $('input#new_ebutton_name').val(),
-						"commands": editor.getValue()
-					});
+        function createbutton(new_button_obj) {
+          var new_button_obj, new_button, nindex = buttons.length;
+					buttons.push(new_button_obj);
 					root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
 						log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
 						log.append(log_div);
@@ -157,6 +113,51 @@
 					$('button#cleareditor').show();
 					$('button#newebutton').show();
 					$('button#runbutton').show();
+				}
+				
+        $('button#clearconsole').click(function () {
+        	if (log.children().length != 0) {
+        		$('div.shader').show();
+        		$('div.confirmation').show();
+        		$('button#confirm').click(function() {
+        			log.html('');
+        			$('div.confirmation').hide();
+        			$('div.shader').hide();
+        		});
+        	}
+        });
+        $('button#newebutton').click(function () {
+          $('div#root').addClass('dialogged');
+          setTimeout(function () {
+            $('#root_dialog').show();
+            $('#new_button_name').select();
+          }, 300);
+          root_expanded = true;
+          $('#new_button_commands').val(editor.getValue());
+        });
+        $('button#cleareditor').click(function() {
+        	if (editor.getValue() != '') {
+        		$('div.shader').show();
+        		$('div.confirmation').show();
+        		$('button#confirm').click(function() {
+        			editor.setValue('');
+        			$('div.confirmation').hide();
+							$('div.shader').hide();
+        		});
+        	}
+				});
+				$('button#newebutton').click(function() {
+					$('button#cleareditor').hide();
+					$('button#newebutton').hide();
+					$('button#runbutton').hide();
+					$('button#cancelbutton').show()
+					$('button#savebutton').show()
+					$('span#editortitle').hide();
+					$('span#editor_new_name').show();
+					$('input#new_ebutton_name').select();
+				});
+				$('button#savebutton').click(function() {
+					createbutton({'name': $('input#new_ebutton_name').val(), 'commands': editor.getValue()});
 				});
 				$('button#cancelbutton').click(function() {
 					$('input#new_ebutton_name').val('');
@@ -191,6 +192,20 @@
 				$('button#deny').click(function() {
 					$('div.confirmation').hide();
 					$('div.shader').hide();
+				});
+				var buttonsjson;
+				$.ajax({
+				  url: '/getbuttons',
+				  datatype: 'json',
+				  success: (function() {
+				    return function(server_response) {
+				    	buttonsjson = server_reponse;
+				    	console.log(buttonsjson);
+				      for key in buttonsjson {
+					      createbutton({'name': key, 'commands': buttonsjson[key]});
+				      }
+				    }
+				  })
 				});
       })
     </script>
