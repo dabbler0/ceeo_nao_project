@@ -32,99 +32,99 @@
         }
         function createbutton(new_button_obj) {
           var new_button_obj, new_button, nindex = buttons.length;
-					buttons.push(new_button_obj);
-					root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
-						log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
-						log.append(log_div);
-						log_div[0].scrollIntoView(false);
-						$.ajax({
-							method: 'POST',
-							url: '/code',
-							data: {
-								'data': JSON.stringify({'code': editor.getValue()})
-							},
-							dataType: 'json',
-							success: (function(log_div) {
-								return function(server_response) {
-									log_div.append($('<div>').addClass('indented').text(server_response.response));
-									log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
-									log_div.children().last()[0].scrollIntoView(false);
-								}
-							}(log_div))
-						});
-					})).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
-						if (new_button.children('.edit').text() == 'E') {
-							editortext = editor.getValue();
-							$('input#new_ebutton_name').val(new_button_obj.name);
-							editor.setValue(new_button_obj.commands);
-							new_button.children('.edit').text('C').attr('title', 'Cancel');
-							new_button.children('.run').hide();
-							$('button#cleareditor').hide();
-					    $('button#newebutton').hide();
-					    $('button#runbutton').hide();
-					    $('button#cancelbutton').hide();
-					    $('button#savebutton').hide();
-					    $('button#donebutton').show();
-					    $('span#editortitle').hide();
-					    $('span#editor_new_name').show();
-					    $('input#new_ebutton_name').select();
-					    $('button#donebutton').click(function() {
-					      new_button_obj.name = $('input#new_ebutton_name').val();
-						    new_button.children('.button_title').text(new_button_obj.name);
-						    new_button_obj.commands = editor.getValue();
-						    new_button.attr('title', new_button_obj.commands);
-						    editor.setValue(editortext);
-						    new_button.children('.edit').text('E').attr('title', 'Edit');
-						    new_button.children('.run').show();
-						    $('input#new_ebutton_name').val('');
-							  $('span#editor_new_name').hide();
-							  $('span#editortitle').show();
-							  $('button#donebutton').hide();
-							  $('button#cleareditor').show();
-							  $('button#newebutton').show();
-							});
-						}
-						else {
-						  editor.setValue(editortext);
-						  new_button.children('.edit').text('E').attr('title', 'Edit');
-						  new_button.children('.run').show();
-						  $('input#new_ebutton_name').val('');
-						  $('span#editor_new_name').hide();
-						  $('span#editortitle').show();
-						  $('button#donebutton').hide();
-						  $('button#cleareditor').show();
-						  $('button#newebutton').show();
-						}
-					})).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
-						$('div.shader').show();
-						$('div.confirmation').show();
-						$('button#confirm').click(function() {
-							new_button.remove();
-							buttons.splice(nindex, 1);
-							$('div.confirmation').hide();
-							$('div.shader').hide();
-						});
-					})).append($('<div>').addClass('button_title').text(new_button_obj.name)));
-					$('input#new_ebutton_name').val('');
-					$('span#editor_new_name').hide();
-					$('span#editortitle').show();
-					$('button#cancelbutton').hide();
-					$('button#savebutton').hide();
-					$('button#cleareditor').show();
-					$('button#newebutton').show();
-					$('button#runbutton').show();
-				}
-				
+          buttons.push(new_button_obj);
+          root_button.after(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
+            log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
+            log.append(log_div);
+            log_div[0].scrollIntoView(false);
+            $.ajax({
+              method: 'POST',
+              url: '/code',
+              data: {
+                'data': JSON.stringify({'code': editor.getValue()})
+              },
+              dataType: 'json',
+              success: (function(log_div) {
+                return function(server_response) {
+                  log_div.append($('<div>').addClass('indented').text(server_response.response));
+                  log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
+                  log_div.children().last()[0].scrollIntoView(false);
+                }
+              }(log_div))
+            });
+          })).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
+            if (new_button.children('.edit').text() == 'E') {
+              editortext = editor.getValue();
+              $('input#new_ebutton_name').val(new_button_obj.name);
+              editor.setValue(new_button_obj.commands);
+              new_button.children('.edit').text('C').attr('title', 'Cancel');
+              new_button.children('.run').hide();
+              $('button#cleareditor').hide();
+              $('button#newebutton').hide();
+              $('button#runbutton').hide();
+              $('button#cancelbutton').hide();
+              $('button#savebutton').hide();
+              $('button#donebutton').show();
+              $('span#editortitle').hide();
+              $('span#editor_new_name').show();
+              $('input#new_ebutton_name').select();
+              $('button#donebutton').click(function() {
+                new_button_obj.name = $('input#new_ebutton_name').val();
+                new_button.children('.button_title').text(new_button_obj.name);
+                new_button_obj.commands = editor.getValue();
+                new_button.attr('title', new_button_obj.commands);
+                editor.setValue(editortext);
+                new_button.children('.edit').text('E').attr('title', 'Edit');
+                new_button.children('.run').show();
+                $('input#new_ebutton_name').val('');
+                $('span#editor_new_name').hide();
+                $('span#editortitle').show();
+                $('button#donebutton').hide();
+                $('button#cleareditor').show();
+                $('button#newebutton').show();
+              });
+            }
+            else {
+              editor.setValue(editortext);
+              new_button.children('.edit').text('E').attr('title', 'Edit');
+              new_button.children('.run').show();
+              $('input#new_ebutton_name').val('');
+              $('span#editor_new_name').hide();
+              $('span#editortitle').show();
+              $('button#donebutton').hide();
+              $('button#cleareditor').show();
+              $('button#newebutton').show();
+            }
+          })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
+            $('div.shader').show();
+            $('div.confirmation').show();
+            $('button#confirm').click(function() {
+              new_button.remove();
+              buttons.splice(nindex, 1);
+              $('div.confirmation').hide();
+              $('div.shader').hide();
+            });
+          })).append($('<div>').addClass('button_title').text(new_button_obj.name)));
+          $('input#new_ebutton_name').val('');
+          $('span#editor_new_name').hide();
+          $('span#editortitle').show();
+          $('button#cancelbutton').hide();
+          $('button#savebutton').hide();
+          $('button#cleareditor').show();
+          $('button#newebutton').show();
+          $('button#runbutton').show();
+        }
+        
         $('button#clearconsole').click(function () {
-        	if (log.children().length != 0) {
-        		$('div.shader').show();
-        		$('div.confirmation').show();
-        		$('button#confirm').click(function() {
-        			log.html('');
-        			$('div.confirmation').hide();
-        			$('div.shader').hide();
-        		});
-        	}
+          if (log.children().length != 0) {
+            $('div.shader').show();
+            $('div.confirmation').show();
+            $('button#confirm').click(function() {
+              log.html('');
+              $('div.confirmation').hide();
+              $('div.shader').hide();
+            });
+          }
         });
         $('button#newebutton').click(function () {
           $('div#root').addClass('dialogged');
@@ -136,77 +136,77 @@
           $('#new_button_commands').val(editor.getValue());
         });
         $('button#cleareditor').click(function() {
-        	if (editor.getValue() != '') {
-        		$('div.shader').show();
-        		$('div.confirmation').show();
-        		$('button#confirm').click(function() {
-        			editor.setValue('');
-        			$('div.confirmation').hide();
-							$('div.shader').hide();
-        		});
-        	}
-				});
-				$('button#newebutton').click(function() {
-					$('button#cleareditor').hide();
-					$('button#newebutton').hide();
-					$('button#runbutton').hide();
-					$('button#cancelbutton').show()
-					$('button#savebutton').show()
-					$('span#editortitle').hide();
-					$('span#editor_new_name').show();
-					$('input#new_ebutton_name').select();
-				});
-				$('button#savebutton').click(function() {
-					createbutton({'name': $('input#new_ebutton_name').val(), 'commands': editor.getValue()});
-				});
-				$('button#cancelbutton').click(function() {
-					$('input#new_ebutton_name').val('');
-					$('span#editor_new_name').hide();
-					$('span#editortitle').show();
-					$('button#cancelbutton').hide();
-					$('button#savebutton').hide();
-					$('button#cleareditor').show();
-					$('button#newebutton').show();
-					$('button#runbutton').show();
-				});
-				$('button#runbutton').click(function() {
-					log_div = $("<div>").addClass("log").text("[Editor]");
-					log.append(log_div);
-					log_div[0].scrollIntoView(false);
-					$.ajax({
-						method: 'POST',
-						url: '/code',
-						data: {
-							'code': editor.getValue()
-						},
-						dataType: 'json',
-						success: (function(log_div) {
-							return function(server_response) {
-								log_div.append($('<div>').addClass('indented').text(server_response.response));
-								log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
-								log_div.children().last()[0].scrollIntoView(false);
-							}
-						}(log_div))
-					});
-				});
-				$('button#deny').click(function() {
-					$('div.confirmation').hide();
-					$('div.shader').hide();
-				});
-				var buttonsjson;
-				$.ajax({
-				  url: '/getbuttons',
-				  datatype: 'json',
-				  success: (function() {
-				    return function(server_response) {
-				    	buttonsjson = server_reponse;
-				    	console.log(buttonsjson);
-				      for key in buttonsjson {
-					      createbutton({'name': key, 'commands': buttonsjson[key]});
-				      }
-				    }
-				  })
-				});
+          if (editor.getValue() != '') {
+            $('div.shader').show();
+            $('div.confirmation').show();
+            $('button#confirm').click(function() {
+              editor.setValue('');
+              $('div.confirmation').hide();
+              $('div.shader').hide();
+            });
+          }
+        });
+        $('button#newebutton').click(function() {
+          $('button#cleareditor').hide();
+          $('button#newebutton').hide();
+          $('button#runbutton').hide();
+          $('button#cancelbutton').show()
+          $('button#savebutton').show()
+          $('span#editortitle').hide();
+          $('span#editor_new_name').show();
+          $('input#new_ebutton_name').select();
+        });
+        $('button#savebutton').click(function() {
+          createbutton({'name': $('input#new_ebutton_name').val(), 'commands': editor.getValue()});
+        });
+        $('button#cancelbutton').click(function() {
+          $('input#new_ebutton_name').val('');
+          $('span#editor_new_name').hide();
+          $('span#editortitle').show();
+          $('button#cancelbutton').hide();
+          $('button#savebutton').hide();
+          $('button#cleareditor').show();
+          $('button#newebutton').show();
+          $('button#runbutton').show();
+        });
+        $('button#runbutton').click(function() {
+          log_div = $("<div>").addClass("log").text("[Editor]");
+          log.append(log_div);
+          log_div[0].scrollIntoView(false);
+          $.ajax({
+            method: 'POST',
+            url: '/code',
+            data: {
+              'code': editor.getValue()
+            },
+            dataType: 'json',
+            success: (function(log_div) {
+              return function(server_response) {
+                log_div.append($('<div>').addClass('indented').text(server_response.response));
+                log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
+                log_div.children().last()[0].scrollIntoView(false);
+              }
+            }(log_div))
+          });
+        });
+        $('button#deny').click(function() {
+          $('div.confirmation').hide();
+          $('div.shader').hide();
+        });
+        var buttonsjson;
+        $.ajax({
+          url: '/getbuttons',
+          datatype: 'json',
+          success: (function() {
+            return function(server_response) {
+              buttonsjson = server_reponse;
+              console.log(buttonsjson);
+              for key in buttonsjson {
+                createbutton({'name': key, 'commands': buttonsjson[key]});
+              }
+            }
+          })
+        });
       })
     </script>
     <style>
