@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 import BaseHTTPServer
+import urllib
 import urlparse
 import simplejson as json
 import interpreter
+import math
 
 from naoqi import ALProxy
 
@@ -11,11 +13,12 @@ SAVED_COMMANDS_FILE = "commands.json"
 #Create the proxies we'll need to execute commands
 ttsproxy = ALProxy("ALTextToSpeech", "localhost", 9559)
 walkproxy = ALProxy("ALMotion", "localhost", 9559)
+bmproxy = ALProxy("ALBehaviorManager", "localhost", 9559)
+netproxy = ALProxy("ALNetwork", "localhost", 9559)
 
 '''
 #These aren't needed right now but might be in the future
 
-bmproxy = ALProxy("ALBehaviorManager", "localhost", 9559)
 adproxy = ALProxy("ALAudioDevice", "localhost", 9559)
 
 '''
@@ -24,7 +27,7 @@ def dVFloat (dic, key, val):
   #Parse a dictionary element as a float if it exists, otherwise default to (val).
   return float(dic[key]) if key in dic else val
 
-class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
+class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
   def do_GET(self):
     #Parse the given path
     parsed = urlparse.urlparse(self.path)
@@ -37,16 +40,25 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     
     print path
 
-    if len(path) < 2 or path[1] == '' or path[1] == "index.html":
+    if len(path) < 2 or path[1] == '' or path[1] == 'index.html':
       index_file = open("index.html")
       self.send_response(200)
       self.send_header("Content-type", "text/html")
       self.end_headers()
       self.wfile.write(index_file.read())
-    if path[1] == "src-noconflict":
+      index_file.close()
+    elif path[len(path) - 1] == 'favicon.ico':
+      favicon_file = open('favicon.ico')
+      self.send_response(200)
+      self.send_header("Content-type", "image/x-icon")
+      self.end_headers()
+      self.wfile.write(favicon_file.read())
+      favicon_file.close()
+    elif path[1] == "src-noconflict":
       rfile = open("/".join(path[1:]))
       self.send_response(200)
-      self.send_header("Content-type", "text/plain")
+      if path[len(path) - 1].index('.js') == -1: self.send_header("Content-type", "text/css")
+      else: self.send_header("Content-type", "text/javascript")
       self.end_headers()
       self.wfile.write(rfile.read())
       rfile.close()
@@ -60,7 +72,7 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       if qwargs["command"] == 'say':
         #Say whatever the client wanted us to
         tosay = qwargs["text"]
-        ttsproxy.post.say(tosay) #TODO maybe daemonize this, so as to respond more quickly.
+        ttsproxy.post.say(tosay)
         
         #Reply that we've said it.
         reply["success"] = True
@@ -71,12 +83,12 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         walkproxy.walkInit()
 
         #Walk. Turn by "turn" radians, then move fowards by "forward", right by "right" meters.
-        walkproxy.walkTo(dVFloat(qwargs, "forward", 0), dVFloat(qwargs, "right", 0), dVFloat(qwargs, "turn", 0))
+        walkproxy.walkTo(dVFloat(qwargs, "forward", 0), dVFloat(qwargs, "right", 0), dVFloat(qwargs, "turn", 0) * 180 / math.pi)
         
         #Reply with success.
         reply["success"] = True
 
-      elif qwargs["command"] == "halt":
+      elif qwargs["command"] == 'halt':
         #Tell our walk proxy to stop
         walkproxy.stopWalk()
         
@@ -124,11 +136,17 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
 
         #Reply with success.
         reply["success"] = True
+
+      elif qwargs["command"] == 'ping':
+        reply["response"] = "pong"
+
+        #Reply with success
+        reply["success"] = True
       
       else:
         #Otherwise, we have no idea what's going on.
         reply["success"] = False
-        reply["error"] = "Unknown command."
+        reply["response"] = "Unknown command."
     
       self.send_response(200)
       self.send_header("Content-Type", "application/json")
@@ -141,6 +159,13 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       self.end_headers()
       self.wfile.write(lfile.read())
       lfile.close()
+    elif path[1] == 'getbuttons':
+      buttonsfile = open('buttons.txt')
+      self.send_response(200)
+      self.send_header("Content-Type", "application.json")
+      self.end_headers()
+      self.wfile.write(buttonsfile.read())
+      buttonfile.close()
 
   def do_POST(self):
     #Parse the given path
@@ -161,16 +186,39 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       reply["success"] = True
     if path[1] == "code":
       code = urllib.unquote(urlparse.parse_qs(self.wfile.read())["code"][0])
-      lines = interpreter.fullParse(open(sys.argv[1]).read())
+      lines = interpreter.fullParse(code.read())
       for line in lines:
         interpreter.line.evaluate(global_scope)
+      reply["success"] = True
+    elif path[1] == 'setbutton':
+      buttondata = urllib.unquote(self.rfile.read()).replace('+', ' ')
+      reply["success"] = True
+      buttonsfile = open('buttons.txt')
+      contents = buttonsfile.read()
+      buttonsfile.close()
+      if contents.index('\n[' + buttondata['name'] + ']') == -1:
+        wbuttonsfile = open('buttons.txt', 'wa')
+        wbuttonsfile.write('[' + buttondata['name'] + '][' + buttondata['commands'] + ']\n');
+        wbuttonsfile.close()
+      else:
+        if buttondata['delete']:
+          startlocation = contents.index('\n[' + buttondata['name'] + ']')
+          wbuttonsfile = open('buttons.txt', 'w')
+          wbuttonsfile.write(contents[:startlocation - 1] + contents[contents.index('\n', startlocation):])
+          wbuttonsfile.close()
+        else:
+          startlocation = contents.index('\n[' + buttondata['name'] + ']')
+          wbuttonsfile = open('buttons.txt', 'w')
+          wbuttonsfile.write(contents[:startlocation + len(buttondata['name']) + 2] + buttondata['commands'] + contents[contents.index('\n', startlocation) - 1:])
+          wbuttonsfile.close()
 
     self.send_response(200)
     self.send_header("Content-Type", "application/json")
     self.end_headers()
-    self.wfile.write(simplejson.dumps(reply))
+    self.wfile.write(json.dumps(reply))
 
 if __name__ == "__main__":
-  print "Starting server on port 8080."
-  httpd = BaseHTTPServer.HTTPServer(('', 8080), MaoHandler)
+  ip_address = netproxy.getLocalIP()
+  print 'Starting server on %s:8080' % ip_address
+  httpd = BaseHTTPServer.HTTPServer(('', 8080), NaoHandler)
   httpd.serve_forever()
