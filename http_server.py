@@ -193,7 +193,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         line.evaluate(interpreter.global_scope)
       reply["success"] = True
     elif path[1] == 'setbutton':
-      buttondata = urllib.unquote(self.rfile.read(int(self.headers.getheader('content-length')), keep_blank_values=1)).replace('+', ' ')
+      buttondata = urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values=1)["data"][0]).replace('+', ' ')
       reply["success"] = True
       buttonsfile = open('buttons.txt')
       contents = buttonsfile.read()

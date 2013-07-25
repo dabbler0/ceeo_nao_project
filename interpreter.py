@@ -21,8 +21,7 @@ WHILE_MANNER = 3
 CONDITIONAL_MANNER = 4
 RETURN_STATEMENT_MANNER = 5
 
-operator_priority_list = [ROOT, "=", "is", ">", "<", "+", "-", "mod", "*", "/"]
-
+operator_priority_list = [ROOT, "=", "and", "or", "is", "==" ">", "<", "+", "-", "mod", "*", "/"]
 ttsproxy = ALProxy("ALTextToSpeech", "localhost", 9559)
 sonarproxy = ALProxy("ALSonar", "localhost", 9559)
 walkproxy = ALProxy("ALMotion", "localhost", 9559)
@@ -172,7 +171,7 @@ def turn ((x,)):
 
 # The global scope, which to begin with contains the native functions.
 global_scope = Stack(None, state = {
-  "+": NativeFunction(lambda (a, b): a + b, name = "+"),
+  "+": NativeFunction(lambda (a, b): a + b if isinstance(a, int) and isinstance(b, int) else str(a) + str(b), name = "+"),
   "-": NativeFunction(lambda (a, b): a - b, name = "-"),
   "*": NativeFunction(lambda (a, b): a * b, name = "*"),
   "/": NativeFunction(lambda (a, b): a / b, name = "/"),
@@ -180,7 +179,13 @@ global_scope = Stack(None, state = {
   "<": NativeFunction(lambda (a, b): a < b, name = "/"),
   "mod": NativeFunction(lambda (a, b): a % b, name = "mod"),
   "is": NativeFunction(lambda (a, b): a == b, name = "is"),
+  "==": NativeFunction(lambda (a, b): a == b, name = "=="),
+  "not": NativeFunction(lambda (x,): not x, name = "not"),
+  "and": NativeFunction(lambda (a, b): a and b, name = "and"),
+  "or": NativeFunction(lambda (a, b): a or b, name = "or"),
   "print": NativeFunction(lambda (x,): sys.stdout.write(str(x) + "\n"), name = "print"),
+  "true": True,
+  "false": False,
   "walk": NativeFunction(walk, name = "walk"),
   "say": NativeFunction(lambda (x,): ttsproxy.say(str(x)), name = "say"),
   "stand": NativeFunction(lambda l: bmproxy.runBehavior("Stand Up"), name="stand"),
@@ -190,7 +195,7 @@ global_scope = Stack(None, state = {
   "volume": NativeFunction(lambda (x,): adproxy.setOutputVolume(int(commands["volume"])), name="volume"),
   "neg": NativeFunction(lambda (x,): -x, name = "neg"),
   "distance": NativeFunction(lambda (x,): memproxy.getData("Device/SubDeviceList/US/Left/Sensor/Value") if x == "left" else memproxy.getData("Device/SubDeviceList/US/Right/Sensor/Value"), name = "distance"),
-  "brightness": NativeFunction(lambda l: 100 - (memproxy.getData("DarknessDetection/DarknessValue") * 50 / 47), name = "brightness")
+  "brightness": NativeFunction(lambda l: 100 - (memproxy.getData("DarknessDetection/DarknessValue") * 50 / 47), name = "brightness"),
 })
 
 ##########
