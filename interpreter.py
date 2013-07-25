@@ -218,8 +218,6 @@ def resetGlobalScope(log_file):
     "brightness": NativeFunction(lambda l: 100 - (memproxy.getData("DarknessDetection/DarknessValue") * 50 / 47), name = "brightness"),
   })
 
-resetGlobalScope()
-
 ##########
 # Parser #
 ##########
@@ -576,6 +574,7 @@ def fullParse(text):
   return block
 
 if __name__ == "__main__":
+  resetGlobalScope([])
   lines = fullParse(open(sys.argv[1]).read())
   for line in lines:
     line.evaluate(global_scope)
