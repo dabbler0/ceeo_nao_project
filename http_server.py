@@ -193,6 +193,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       lines = interpreter.fullParse(code)
       for line in lines:
         line.evaluate(interpreter.global_scope)
+      print log
       reply["success"] = True
       reply["response"] = "\n".join(log)
     elif path[1] == 'setbutton':

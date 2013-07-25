@@ -21,7 +21,7 @@ WHILE_MANNER = 3
 CONDITIONAL_MANNER = 4
 RETURN_STATEMENT_MANNER = 5
 
-operator_priority_list = [ROOT, "=", "and", "or", "is", "==" ">", "<", "+", "-", "mod", "*", "/"]
+operator_priority_list = [ROOT, "=", "and", "or", "is", "==", ">", "<", "+", "-", "mod", "*", "/"]
 ttsproxy = ALProxy("ALTextToSpeech", "localhost", 9559)
 sonarproxy = ALProxy("ALSonar", "localhost", 9559)
 walkproxy = ALProxy("ALMotion", "localhost", 9559)
@@ -37,6 +37,9 @@ memproxy = ALProxy("ALMemory", "localhost", 9559)
 
 def valuefy(tree): #DEBUGGING ONLY
   return tree.value if tree.value not in [ROOT, PAREN] else ["ROOT", "PAREN"][tree.value]
+
+def raw_valuefy(value):
+  return value if value not in [ROOT, PAREN] else ["ROOT", "PAREN"][value]
 
 def isStaticAtomic(string):
   return (string.isalnum() and not string in operator_priority_list) or (string[0] == '"' and string[len(string) - 1] == '"')
@@ -271,10 +274,13 @@ class TreeNode:
 def hasPriority(o1, o2):
   for operator in operator_priority_list:
     if operator == o1:
+      print "%s == %s, so %s has priority over %s." % (raw_valuefy(operator), raw_valuefy(o1), raw_valuefy(o1), raw_valuefy(o2))
       return True
     elif operator == o2:
+      print "%s == %s, so %s has priority over %s." % (raw_valuefy(operator), raw_valuefy(o2), raw_valuefy(o2), raw_valuefy(o1))
       return False
-  return None
+  print "No operational match for either %s or %s in %r." % (o1, o2, operator_priority_list)
+  return None # This is actually an error condition, so we should say so. TODO
 
 def parse (lines, indentation):
   # Parse a program into a list of parse trees.
@@ -447,7 +453,7 @@ def parse (lines, indentation):
             # Otherwise, we have an atomic or operant token.
             strung_child = None # This will be for in case we have insert our node between two others
             new_manner = OPERANT_MANNER if token in operator_priority_list else NORMAL_MANNER
-
+            
             while (tree.paren_depth > current_paren_depth) or (tree.paren_depth == current_paren_depth and (not hasPriority(tree.value, token)) and (not (tree.manner == 1))):
               # DEBUGGING
               # print "  deferring %s." % valuefy(tree)
