@@ -162,7 +162,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     elif path[1] == 'getbuttons':
       buttonsfile = open('buttons.json')
       self.send_response(200)
-      self.send_header("Content-Type", "application.json")
+      self.send_header("Content-Type", "application/json")
       self.end_headers()
       self.wfile.write(buttonsfile.read())
       buttonfile.close()
