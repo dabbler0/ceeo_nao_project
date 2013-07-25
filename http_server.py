@@ -2,6 +2,7 @@
 import BaseHTTPServer
 import urlparse
 import simplejson as json
+import interpreter
 
 from naoqi import ALProxy
 
@@ -158,6 +159,11 @@ class MaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       wfile.write(self.rfile.read())
       wfile.close()
       reply["success"] = True
+    if path[1] == "code":
+      code = urllib.unquote(urlparse.parse_qs(self.wfile.read())["code"][0])
+      lines = interpreter.fullParse(open(sys.argv[1]).read())
+      for line in lines:
+        interpreter.line.evaluate(global_scope)
 
     self.send_response(200)
     self.send_header("Content-Type", "application/json")
