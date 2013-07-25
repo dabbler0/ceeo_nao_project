@@ -80,6 +80,7 @@
               $('span#editortitle').hide();
               $('span#editor_new_name').show();
               $('input#new_ebutton_name').select();
+              $('button#donebutton').unbind('click');
               $('button#donebutton').click(function() {
                 new_button_obj.name = $('input#new_ebutton_name').val();
                 new_button.children('.button_title').text(new_button_obj.name);
@@ -110,6 +111,7 @@
           })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
             $('div.shader').show();
             $('div.confirmation').show();
+            $('button#confirm').unbind('click');
             $('button#confirm').click(function() {
               new_button.remove();
               buttons.splice(nindex, 1);
@@ -139,6 +141,7 @@
           if (log.children().length != 0) {
             $('div.shader').show();
             $('div.confirmation').show();
+            $('button#confirm').unbind('click');
             $('button#confirm').click(function() {
               log.html('');
               $('div.confirmation').hide();
@@ -150,6 +153,7 @@
           if (editor.getValue() != '') {
             $('div.shader').show();
             $('div.confirmation').show();
+            $('button#confirm').unbind('click');
             $('button#confirm').click(function() {
               editor.setValue('');
               $('div.confirmation').hide();
