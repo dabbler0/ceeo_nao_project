@@ -202,13 +202,13 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         if buttondata['delete']:
           del(contents[buttondata['name']])
           wbuttonsfile = open('buttons.json', 'w')
-          wbuttonsfile.write(contents)
+          wbuttonsfile.write(json.dumps(contents))
           wbuttonsfile.close()
         else:
           contents[buttondata['name']] = buttondata['commands']
           startlocation = contents.index('\n[' + buttondata['name'] + ']')
           wbuttonsfile = open('buttons.json', 'w')
-          wbuttonsfile.write(contents)
+          wbuttonsfile.write(json.dumps(contents))
           wbuttonsfile.close()
         reply["success"] = True
       else:
