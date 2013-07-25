@@ -165,7 +165,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       self.send_header("Content-Type", "application/json")
       self.end_headers()
       self.wfile.write(buttonsfile.read())
-      buttonfile.close()
+      buttonsfile.close()
 
   def do_POST(self):
     #Parse the given path
