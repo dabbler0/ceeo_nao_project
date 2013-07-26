@@ -7,7 +7,8 @@
         var buttons = [],
           log = $("div#log"),
           buttonslist = $('div#buttons'),
-          editortext
+          editortext,
+		  oldname
 
         function interpret(commands) {
           var lines = commands.split("\n"),
@@ -30,16 +31,23 @@
           return rarray;
         }
         function createbutton(new_button_obj) {
-          var new_button_obj, new_button, nindex = buttons.length;
+          var new_button_obj, new_button, nindex = buttons.length, failure;
           buttons.push(new_button_obj);
           $.ajax({
             method: 'POST',
-            url: '/setbutton',
+			async: false,
+            url: '/addbutton',
             data: {
-              'data': JSON.stringify({"name": new_button_obj.name, "commands": new_button_obj.commands, "delete": false})
+              'data': JSON.stringify({"name": new_button_obj.name, "commands": new_button_obj.commands})
             },
-            dataType: "json"
+            dataType: "json",
+			success: (function() {
+			  return function(server_reponse) {
+			    failure = server_response.nameerror;
+			  }
+			 }())
           });
+		  if (failure) return false;
           buttonslist.append(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
             log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
             log.append(log_div);
@@ -80,28 +88,37 @@
               $('span#editor_new_name').show();
               $('input#new_ebutton_name').select();
               $('button#donebutton').unbind('click');
+			  oldname = new_button_obj.name;
               $('button#donebutton').click(function() {
                 new_button_obj.name = $('input#new_ebutton_name').val();
                 new_button.children('.button_title').text(new_button_obj.name);
                 new_button_obj.commands = editor.getValue();
                 new_button.attr('title', new_button_obj.commands);
                 $.ajax({
-									method: 'POST',
-									url: '/setbutton',
-									data: {
-										'data': JSON.stringify({"name": new_button_obj.name, "commands": new_button_obj.commands, "delete": false})
-									},
-									dataType: "json"
-								});
-                editor.setValue(editortext);
-                new_button.children('.edit').text('E').attr('title', 'Edit');
-                new_button.children('.run').show();
-                $('input#new_ebutton_name').val('');
-                $('span#editor_new_name').hide();
-                $('span#editortitle').show();
-                $('button#donebutton').hide();
-                $('button#cleareditor').show();
-                $('button#newebutton').show();
+				  method: 'POST',
+				  url: '/editbutton',
+				  data: {
+					'data': JSON.stringify({"oldname": oldname, "newname": new_button_obj.name, "commands": new_button_obj.commands})
+				  },
+				  dataType: "json",
+				  success: (function() {
+				    return function(server_response) {
+					  failure = server_response.nameerror;
+					}
+				  }())
+				});
+				if (failure) alert ('This button name is already in use, please name yours something else.');
+				else {
+                  editor.setValue(editortext);
+                  new_button.children('.edit').text('E').attr('title', 'Edit');
+                  new_button.children('.run').show();
+                  $('input#new_ebutton_name').val('');
+                  $('span#editor_new_name').hide();
+                  $('span#editortitle').show();
+                  $('button#donebutton').hide();
+                  $('button#cleareditor').show();
+                  $('button#newebutton').show();
+				}
               });
             }
             else {
@@ -124,9 +141,9 @@
               buttons.splice(nindex, 1);
               $.ajax({
               	method: 'POST',
-              	url: '/setbutton',
+              	url: '/delbutton',
               	data: {
-              		'data': JSON.stringify({'name': new_button_obj.name, 'delete': true})
+              		'data': JSON.stringify({'name': new_button_obj.name})
               	},
               	dataType: 'json'
               });
@@ -134,14 +151,7 @@
               $('div.shader').hide();
             });
           })).append($('<div>').addClass('button_title').text(new_button_obj.name)));
-          $('input#new_ebutton_name').val('');
-          $('span#editor_new_name').hide();
-          $('span#editortitle').show();
-          $('button#cancelbutton').hide();
-          $('button#savebutton').hide();
-          $('button#cleareditor').show();
-          $('button#newebutton').show();
-          $('button#runbutton').show();
+		  return true;
         }
         
         $('button#clearconsole').click(function () {
@@ -179,8 +189,20 @@
           $('input#new_ebutton_name').select();
         });
         $('button#savebutton').click(function() {
-          createbutton({'name': $('input#new_ebutton_name').val(), 'commands': editor.getValue()});
-          editor.setValue('');
+          if (createbutton({'name': $('input#new_ebutton_name').val(), 'commands': editor.getValue()})) {
+		    $('input#new_ebutton_name').val('');
+            $('span#editor_new_name').hide();
+            $('span#editortitle').show();
+            $('button#cancelbutton').hide();
+            $('button#savebutton').hide();
+            $('button#cleareditor').show();
+            $('button#newebutton').show();
+            $('button#runbutton').show();
+            editor.setValue('');
+		  }
+		  else {
+			alert ('This button name is already in use, please name yours something else.');
+		  }
         });
         $('button#cancelbutton').click(function() {
           $('input#new_ebutton_name').val('');
@@ -314,7 +336,7 @@
       div#button_list {
         left:0;
         right:0;
-        top:70px;
+        top:0px;
         bottom:0;
       }
       div.running#button_list {
@@ -405,8 +427,8 @@
         font-size:20px;
         font-family:'Lato';
         position:fixed;
-        top:0px;
-        left:25px;
+        top:25px;
+        left:0px;
         width:350px;
         height:45px;
         border-bottom:1px solid #888;
@@ -583,6 +605,14 @@
         position:relative;
         top:65px;
       }
+	  div#buttons {
+	    position:absolute;
+		top:71px;
+		left:0px;
+		right:0px;
+		bottom:0px;
+	    overflow:auto;
+	  }
     </style>
   </head>
   <body>
