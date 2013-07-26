@@ -203,25 +203,25 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       buttonsfile.close()
       reply["success"] = False
       if buttondata['name'] = contents:
-	del(contents[buttondata['name']])
-	wbuttonsfile = open('buttons.json', 'w')
-	wbuttonsfile.write(json.dumps(contents))
-	wbuttonsfile.close()
-	reply["success"] = True
+        del(contents[buttondata['name']])
+        wbuttonsfile = open('buttons.json', 'w')
+        wbuttonsfile.write(json.dumps(contents))
+        wbuttonsfile.close()
+	      reply["success"] = True
     elif path[1] == 'addbutton':
       buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)["data"][0]))
       buttonsfile = open('buttons.json')
       contents = json.load(buttonsfile)
       buttonsfile.close()
       reply["success"] = False
-	  reply["nameerror"] = True
+      reply["nameerror"] = True
       if not (buttondata['name'] in contents):
         contents[buttondata['name']] = buttondata['commands']
         wbuttonsfile = open('buttons.json', 'w')
         wbuttonsfile.write(json.dumps(contents))
         wbuttonsfile.close()
         reply["success"] = True
-	reply["nameerror"] = False
+        reply["nameerror"] = False
     elif path[1] == 'editbutton':
       buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)["data"][0]))
       buttonsfile = open('buttons.json')
