@@ -196,18 +196,18 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       print log
       reply["success"] = True
       reply["response"] = "\n".join(log)
-	elif path[1] == 'delbutton':
-	  buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)["data"][0]))
-	  buttonsfile = open('buttons.json')
-	  contents = json.load(buttonsfile)
-	  buttonsfile.close()
-	  reply["success"] = False
-	  if buttondata['name'] = contents:
-	    del(contents[buttondata['name']])
-		wbuttonsfile = open('buttons.json', 'w')
-		wbuttonsfile.write(json.dumps(contents))
-		wbuttonsfile.close()
-		reply["success"] = True
+    elif path[1] == 'delbutton':
+      buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)["data"][0]))
+      buttonsfile = open('buttons.json')
+      contents = json.load(buttonsfile)
+      buttonsfile.close()
+      reply["success"] = False
+      if buttondata['name'] = contents:
+	del(contents[buttondata['name']])
+	wbuttonsfile = open('buttons.json', 'w')
+	wbuttonsfile.write(json.dumps(contents))
+	wbuttonsfile.close()
+	reply["success"] = True
     elif path[1] == 'addbutton':
       buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)["data"][0]))
       buttonsfile = open('buttons.json')
@@ -221,21 +221,21 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         wbuttonsfile.write(json.dumps(contents))
         wbuttonsfile.close()
         reply["success"] = True
-		reply["nameerror"] = False
-	elif path[1] == 'editbutton':
-	  buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)["data"][0]))
+	reply["nameerror"] = False
+    elif path[1] == 'editbutton':
+      buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)["data"][0]))
       buttonsfile = open('buttons.json')
       contents = json.load(buttonsfile)
       buttonsfile.close()
       reply["success"] = False
-	  reply["nameerror"] = True
-	  wbuttonsfile = open('buttons.json', 'w')
-	  if buttondata['newname'] in contents: reply["nameerror"] = True
-	  else:
-	    if buttondata['oldname'] in contents: del(contents[buttondata['oldname']])
-	    contents[buttondata['newname']] = buttondata['commands']
-	    buttonsfile.write(json.dumps(contents))
-	  wbuttonsfile.close()
+      reply["nameerror"] = True
+      if buttondata['newname'] in contents: reply["nameerror"] = True
+      else:
+        if buttondata['oldname'] in contents: del(contents[buttondata['oldname']])
+        contents[buttondata['newname']] = buttondata['commands']
+        wbuttonsfile = open('buttons.json', 'w')
+        buttonsfile.write(json.dumps(contents))
+        wbuttonsfile.close()
 
     self.send_response(200)
     self.send_header("Content-Type", "application/json")
