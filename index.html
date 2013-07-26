@@ -5,7 +5,7 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
       $(function () {
-        var editor = ace.edit("editor");
+        var editor = ace.edit("editor"); //create editor and bind to the the element with id 'editor'
         editor.setTheme("ace/theme/github");
         editor.getSession().setMode("ace/mode/javascript");
         editor.getSession().setTabSize(2);
@@ -25,12 +25,13 @@
           confirmbutton = $('button#confirm'),
           shader = $('div.shader'),
           confirmwindow = $('div.confirmation'),
-          editortext,
-          oldname;
+          editortext, //stores the contents of the editor when a button is edited so it can be reinstated when the editing is done
+          oldname; //stores the original name of a button when it is edited so the server can delete the old entry
 
-        function createprogram(new_program_obj, real) {
+        function createprogram(new_program_obj, user_initialized) { //new_program_obj is in the form {'name': program_name, 'commands': program_commands} and user_initialized indicates whether the command is an automated create function (done by getprograms at the start) (false) or the user creating the buttons (true)
           var new_program_obj, new_program, failure;
-          if (real) {
+          if (user_initialized) {
+            //tell the server that a button has been added
             $.ajax({
               method: 'POST',
               url: '/addprogram',
@@ -40,119 +41,140 @@
               dataType: "json",
               success: (function() {
                 return function(server_response) {
-                  failure = server_response.nameerror;
-                  if (!failure) createprogram(new_program_obj, false);
-                  return failure;
+                  success = server_response.success;
+                  if (success) createprogram(new_program_obj, false); //if there is no problem creating the button server-side, create the button without checking again to see if the server thinks it's okay
+                  $('span#sync').text('Done');
+                  setTimeout(function() {
+                  	$('span#sync').text('');
+                  }, 1000);
+                  return success; //return whether the create succeeded on a server
                 }
               }())
             });
+            $('span#sync').text('Syncing...');
           }
-          programslist.append(new_program = $("<div>").addClass("program").attr("title", new_program_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
-            log_div = $("<div>").addClass("log").text("[" + new_program_obj.name + "]");
-            log.append(log_div);
-            log_div[0].scrollIntoView(false);
-            $.ajax({
-              method: 'POST',
-              url: '/code',
-              data: {
-                'code': new_program_obj.commands
-              },
-              dataType: 'json',
-              success: (function(log_div) {
-                return function(server_response) {
-                  log_div.append($('<div>').addClass('indented').css('color', '#00F').text(server_response.response));
-                  if (server_response.success)
-                    log_div.append($('<div>').addClass('indented').css('color', '#0F0').text("Success"));
-                  else
-                    log_div.append($('<div>').addClass('indented').css('color', '#F00').text("Failure"));
-                  log_div.children().last()[0].scrollIntoView(false);
-                }
-              }(log_div))
-            });
-          })).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
-            if (new_program.children('.edit').text() == 'E') {
-              var editbuttons = $('.edit');
-              for (var i = 0; i < editbuttons.length; i++) {
-                if (editbuttons.eq(i).text() == 'C') editbuttons.eq(i).click();
+          else {
+            programslist.append(new_program = $("<div>").addClass("program").attr("title", new_program_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
+              log_div = $("<div>").addClass("log").text("[" + new_program_obj.name + "]");
+              log.append(log_div);
+              log_div[0].scrollIntoView(false);
+              $.ajax({
+                method: 'POST',
+                url: '/code',
+                data: {
+                  'code': new_program_obj.commands
+                },
+                dataType: 'json',
+                success: (function(log_div) {
+                  return function(server_response) {
+                    log_div.append($('<div>').addClass('indented').css('color', '#00F').text(server_response.response));
+                    if (server_response.success)
+                      log_div.append($('<div>').addClass('indented').css('color', '#0F0').text("Success"));
+                    else
+                      log_div.append($('<div>').addClass('indented').css('color', '#F00').text("Failure"));
+                    log_div.children().last()[0].scrollIntoView(false);
+                  }
+                }(log_div))
+              });
+            })).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
+              if (new_program.children('.edit').text() == 'E') {
+                //CLEAN-UP - end all other edit functions and clean up their mess
+                editor.setValue(editortext);
+                $('.edit').text('E').attr('title', 'Edit');
+                $('.run').show();
+                editortext = editor.getValue();
+                //END CLEAN-UP
+                nameinput.val(new_program_obj.name);
+                editor.setValue(new_program_obj.commands);
+                new_program.children('.edit').text('C').attr('title', 'Cancel');
+                new_program.children('.run').hide();
+                cleareditor.hide();
+                newebutton.hide();
+                runbutton.hide();
+                cancelbutton.hide();
+                savebutton.hide();
+                donebutton.show();
+                editortitle.hide();
+                editornewname.show();
+                nameinput.select();
+                donebutton.unbind('click');
+                oldname = new_program_obj.name;
+                donebutton.click(function() {
+                  new_program_obj.name = nameinput.val();
+                  new_program.children('.program_title').text(new_program_obj.name);
+                  new_program_obj.commands = editor.getValue();
+                  new_program.attr('title', new_program_obj.commands);
+                  $.ajax({
+                    method: 'POST',
+                    url: '/editprogram',
+                    data: {
+                      'data': JSON.stringify({"oldname": oldname, "newname": new_program_obj.name, "commands": new_program_obj.commands, "username": username})
+                    },
+                    dataType: "json",
+                    success: (function() {
+                      return function(server_response) {
+                        failure = server_response.nameerror;
+                        $('span#sync').text('Done');
+                        setTimeout(function() {
+                          $('span#sync').text('');
+                        }, 1000);
+                        if (failure) alert ('This program name is already in use, please name yours something else.');
+                        else {
+                          editor.setValue(editortext);
+                          new_program.children('.edit').text('E').attr('title', 'Edit');
+                          new_program.children('.run').show();
+                          nameinput.val('');
+                          editornewname.hide();
+                          editortitle.show();
+                          donebutton.hide();
+                          cleareditor.show();
+                          newebutton.show();
+                        }
+                      }
+                    }())
+                  });
+                  $('span#sync').text('Syncing...');
+                });
               }
-              editortext = editor.getValue();
-              nameinput.val(new_program_obj.name);
-              editor.setValue(new_program_obj.commands);
-              new_program.children('.edit').text('C').attr('title', 'Cancel');
-              new_program.children('.run').hide();
-              cleareditor.hide();
-              newebutton.hide();
-              runbutton.hide();
-              cancelbutton.hide();
-              savebutton.hide();
-              donebutton.show();
-              editortitle.hide();
-              editornewname.show();
-              nameinput.select();
-              donebutton.unbind('click');
-              oldname = new_program_obj.name;
-              donebutton.click(function() {
-                new_program_obj.name = nameinput.val();
-                new_program.children('.program_title').text(new_program_obj.name);
-                new_program_obj.commands = editor.getValue();
-                new_program.attr('title', new_program_obj.commands);
+              else {
+                editor.setValue(editortext);
+                new_program.children('.edit').text('E').attr('title', 'Edit');
+                new_program.children('.run').show();
+                nameinput.val('');
+                editornewname.hide();
+                editortitle.show();
+                donebutton.hide();
+                cleareditor.show();
+                newebutton.show();
+              }
+            })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
+              shader.show();
+              confirmwindow.show();
+              confirmbutton.unbind('click');
+              confirmbutton.click(function() {
+                new_program.remove();
                 $.ajax({
-                  method: 'POST',
-                  async: false,
-                  url: '/editprogram',
-                  data: {
-                    'data': JSON.stringify({"oldname": oldname, "newname": new_program_obj.name, "commands": new_program_obj.commands, "username": username})
-                  },
-                  dataType: "json",
-                  success: (function() {
-                    return function(server_response) {
-                      failure = server_response.nameerror;
+                	method: 'POST',
+                	url: '/delprogram',
+                	data: {
+                		'data': JSON.stringify({"name": new_program_obj.name, "username": username})
+                	},
+                	dataType: 'json',
+                	success: (function() {
+                		return function() {
+                			$('span#sync').text('Done');
+                      setTimeout(function() {
+                      	$('span#sync').text('');
+                      }, 1000);
                     }
                   }())
                 });
-                if (failure) alert ('This program name is already in use, please name yours something else.');
-                else {
-                  editor.setValue(editortext);
-                  new_program.children('.edit').text('E').attr('title', 'Edit');
-                  new_program.children('.run').show();
-                  nameinput.val('');
-                  editornewname.hide();
-                  editortitle.show();
-                  donebutton.hide();
-                  cleareditor.show();
-                  newebutton.show();
-                }
+                $('span#sync').text('Syncing...');
+                confirmwindow.hide();
+                shader.hide();
               });
-            }
-            else {
-              editor.setValue(editortext);
-              new_program.children('.edit').text('E').attr('title', 'Edit');
-              new_program.children('.run').show();
-              nameinput.val('');
-              editornewname.hide();
-              editortitle.show();
-              donebutton.hide();
-              cleareditor.show();
-              newebutton.show();
-            }
-          })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
-            shader.show();
-            confirmwindow.show();
-            confirmbutton.unbind('click');
-            confirmbutton.click(function() {
-              new_program.remove();
-              $.ajax({
-              	method: 'POST',
-              	url: '/delprogram',
-              	data: {
-              		'data': JSON.stringify({"name": new_program_obj.name, "username": username})
-              	},
-              	dataType: 'json'
-              });
-              confirmwindow.hide();
-              shader.hide();
-            });
-          })).append($('<div>').addClass('program_title').text(new_program_obj.name)));
+            })).append($('<div>').addClass('program_title').text(new_program_obj.name)));
+          }
         }
         
         $('button#clearconsole').click(function () {
@@ -254,9 +276,14 @@
                   console.log(key);
                   createprogram({'name': key, 'commands': buttonsjson[key]}, false);
                 }
+                $('span#sync').text('Done');
+                setTimeout(function() {
+                  $('span#sync').text('');
+                }, 1000);
               }
             }())
           });
+          $('span#sync').text('Syncing...');
         });
       })
     </script>
@@ -640,6 +667,11 @@
 	      position:relative;
 	      top:80px;
 	    }
+	    span#sync {
+	      position:absolute;
+	      left: 10px;
+	      color:#999;
+	    }
     </style>
   </head>
   <body>
@@ -661,6 +693,7 @@
         <div class="blockish" id="editor_wrap">
           <div class="filleditorheader"></div>
           <div class="editorheader">
+            <span id="sync"></span>
             <span id="editortitle">Editor</span>
             <span class="init_hidden" id = "editor_new_name">Name: <input id="new_ebutton_name" class="field"/></span>
             <button id="donebutton" class="field init_hidden" title="Done">D</button>

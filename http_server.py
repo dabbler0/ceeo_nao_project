@@ -109,28 +109,25 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
       contents = json.load(programsfile)
       programsfile.close()
       reply['success'] = False
-      reply['nameerror'] = True
       if not (programdata['name'] in contents[programdata['username']]):
         contents[programdata['username']][programdata['name']] = programdata['commands']
         wprogramsfile = open('programs.json', 'w')
         wprogramsfile.write(json.dumps(contents))
         wprogramsfile.close()
         reply['success'] = True
-        reply['nameerror'] = False
     elif path[1] == 'editprogram':
       programdata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)['data'][0]))
       programsfile = open('programs.json')
       contents = json.load(programsfile)
       programsfile.close()
       reply['success'] = False
-      reply['nameerror'] = True
       if not (programdata['newname'] in contents[programdata['username']]) or programdata['newname'] == programdata['oldname']:
         if programdata['oldname'] in contents[programdata['username']]: del(contents[programdata['username']][programdata['oldname']])
         contents[programdata['username']][programdata['newname']] = programdata['commands']
         wprogramsfile = open('programs.json', 'w')
         programsfile.write(json.dumps(contents))
         wprogramsfile.close()
-        reply['nameerror'] = False
+        reply['success'] = True
 
     self.send_response(200)
     self.send_header('Content-Type', 'application/json')
