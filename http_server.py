@@ -125,7 +125,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
         if programdata['oldname'] in contents[programdata['username']]: del(contents[programdata['username']][programdata['oldname']])
         contents[programdata['username']][programdata['newname']] = programdata['commands']
         wprogramsfile = open('programs.json', 'w')
-        programsfile.write(json.dumps(contents))
+        wprogramsfile.write(json.dumps(contents))
         wprogramsfile.close()
         reply['success'] = True
 

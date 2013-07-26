@@ -273,7 +273,6 @@
               return function(server_response) {
                 var buttonsjson = server_response;
                 for (key in buttonsjson) {
-                  console.log(key);
                   createprogram({'name': key, 'commands': buttonsjson[key]}, false);
                 }
                 $('span#sync').text('Done');
