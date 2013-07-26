@@ -62,7 +62,10 @@
               success: (function(log_div) {
                 return function(server_response) {
                   log_div.append($('<div>').addClass('indented').css('color', '#00F').text(server_response.response));
-                  server_response.success ? log_div.append($('<div>').addClass('indented').css('color', '#0F0').text("Success")) : log_div.append($('<div>').addClass('indented').css('color', '#F00').text("Failure"))
+                  if (server_response.success)
+                    log_div.append($('<div>').addClass('indented').css('color', '#0F0').text("Success"));
+                  else
+                    log_div.append($('<div>').addClass('indented').css('color', '#F00').text("Failure"));
                   log_div.children().last()[0].scrollIntoView(false);
                 }
               }(log_div))
@@ -227,8 +230,11 @@
             dataType: 'json',
             success: (function(log_div) {
               return function(server_response) {
-                log_div.append($('<div>').addClass('indented').text(server_response.response));
-                log_div.append($('<div>').addClass('indented').text(server_response.success ? "Success" : "Failure"));
+                log_div.append($('<div>').addClass('indented').css('color', '#00F').text(server_response.response));
+                  if (server_response.success)
+                    log_div.append($('<div>').addClass('indented').css('color', '#0F0').text("Success"));
+                  else
+                    log_div.append($('<div>').addClass('indented').css('color', '#F00').text("Failure"));
                 log_div.children().last()[0].scrollIntoView(false);
               }
             }(log_div))
