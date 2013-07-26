@@ -8,18 +8,16 @@ import math
 
 from naoqi import ALProxy
 
-SAVED_COMMANDS_FILE = "commands.json"
-
 #Create the proxies we'll need to execute commands
-ttsproxy = ALProxy("ALTextToSpeech", "localhost", 9559)
-walkproxy = ALProxy("ALMotion", "localhost", 9559)
-bmproxy = ALProxy("ALBehaviorManager", "localhost", 9559)
-netproxy = ALProxy("ALNetwork", "localhost", 9559)
+ttsproxy = ALProxy('ALTextToSpeech', 'localhost', 9559)
+walkproxy = ALProxy('ALMotion', 'localhost', 9559)
+bmproxy = ALProxy('ALBehaviorManager', 'localhost', 9559)
+netproxy = ALProxy('ALNetwork', 'localhost', 9559)
 
 '''
 #These aren't needed right now but might be in the future
 
-adproxy = ALProxy("ALAudioDevice", "localhost", 9559)
+adproxy = ALProxy('ALAudioDevice', 'localhost', 9559)
 
 '''
 
@@ -31,7 +29,7 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
   def do_GET(self):
     #Parse the given path
     parsed = urlparse.urlparse(self.path)
-    path = parsed.path.split("/")
+    path = parsed.path.split('/')
     qwargs = urlparse.parse_qs(parsed.query)
 
     #Enforce one value per query string argument
@@ -41,136 +39,38 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     print path
 
     if len(path) < 2 or path[1] == '' or path[1] == 'index.html':
-      index_file = open("index.html")
+      index_file = open('index.html')
       self.send_response(200)
-      self.send_header("Content-type", "text/html")
+      self.send_header('Content-type', 'text/html')
       self.end_headers()
       self.wfile.write(index_file.read())
       index_file.close()
     elif path[len(path) - 1] == 'favicon.ico':
       favicon_file = open('favicon.ico')
       self.send_response(200)
-      self.send_header("Content-type", "image/x-icon")
+      self.send_header('Content-type', 'image/x-icon')
       self.end_headers()
       self.wfile.write(favicon_file.read())
       favicon_file.close()
-    elif path[1] == "src-noconflict":
-      rfile = open("/".join(path[1:]))
+    elif path[1] == 'getprograms':
+      programsfile = open('programs.json')
+      contents = json.load(programsfile)
+      programsfile.close()
       self.send_response(200)
-      if path[len(path) - 1].index('.js') == -1: self.send_header("Content-type", "text/css")
-      else: self.send_header("Content-type", "text/javascript")
+      self.send_header('Content-Type', 'application/json')
       self.end_headers()
-      self.wfile.write(rfile.read())
-      rfile.close()
-    elif path[1] == "execute":
-      """
-        Execute a command, described in the query string arguments.
-      """
-
-      reply = {}
-    
-      if qwargs["command"] == 'say':
-        #Say whatever the client wanted us to
-        tosay = qwargs["text"]
-        ttsproxy.post.say(tosay)
-        
-        #Reply that we've said it.
-        reply["success"] = True
-
-      elif qwargs["command"] == 'move':
-        #Initiate a walk command in our walk proxy
-        walkproxy.stiffnessInterpolation("Body", 1, 0.1)
-        walkproxy.walkInit()
-
-        #Walk. Turn by "turn" radians, then move fowards by "forward", right by "right" meters.
-        walkproxy.walkTo(dVFloat(qwargs, "forward", 0), dVFloat(qwargs, "right", 0), dVFloat(qwargs, "turn", 0) * 180 / math.pi)
-        
-        #Reply with success.
-        reply["success"] = True
-
-      elif qwargs["command"] == 'halt':
-        #Tell our walk proxy to stop
-        walkproxy.stopWalk()
-        
-        #Reply with success.
-        reply["success"] = True
-        
-      elif qwargs["command"] == 'relax':
-        #Reduce stiffness.
-        walkproxy.stiffnessInterpolation("Body", 0, 0.1)
-        
-        #Reply with success.
-        reply["success"] = True
-
-      elif qwargs["command"] == 'stiffen':
-        #Increase stiffness.
-        walkproxy.stiffnessInterpolation("Body", 1, 0.1)
-
-        #Reply with success.
-        reply["success"] = True
-
-      elif qwargs["command"] == 'stand':
-        #Stand up.
-        bmproxy.post.runBehavior("Stand Up")
-
-        #Reply with success.
-        reply["success"] = True
-      
-      elif qwargs["command"] == 'sit':
-        #Sit down.
-        bmproxy.post.runBehavior("Sit Down")
-
-        #Reply with success.
-        reply["success"] = True
-
-      elif qwargs["command"] == 'wave':
-        #Wave.
-        bmproxy.post.runBehavior("Wave")
-
-        #Reply with success.
-        reply["success"] = True
-
-      elif qwargs["command"] == 'setvol':
-        #Set the volume to the given volume.
-        adproxy.setOutputVolume(int(commands["volume"]))
-
-        #Reply with success.
-        reply["success"] = True
-
-      elif qwargs["command"] == 'ping':
-        reply["response"] = "pong"
-
-        #Reply with success
-        reply["success"] = True
-      
-      else:
-        #Otherwise, we have no idea what's going on.
-        reply["success"] = False
-        reply["response"] = "Unknown command."
-    
-      self.send_response(200)
-      self.send_header("Content-Type", "application/json")
-      self.end_headers()
-      self.wfile.write(json.dumps(reply))
-    elif path[1] == "load":
-      lfile = open(SAVED_COMMANDS_FILE, "r")
-      self.send_response(200)
-      self.send_header("Content-Type", "application/json")
-      self.end_headers()
-      self.wfile.write(lfile.read())
-      lfile.close()
-    elif path[1] == 'getbuttons':
-      buttonsfile = open('buttons.json')
-      self.send_response(200)
-      self.send_header("Content-Type", "application/json")
-      self.end_headers()
-      self.wfile.write(buttonsfile.read())
-      buttonsfile.close()
+      if not ('username' in qwargs): qwargs['username'] = ''
+      if not (qwargs['username'] in contents):
+      	contents[qwargs['username']] = {}
+      	wprogramsfile = open('programs.json', 'w')
+      	wprogramsfile.write(json.dumps(contents))
+      	wprogramsfile.close()
+      self.wfile.write(json.dumps(contents[qwargs['username']]))
 
   def do_POST(self):
     #Parse the given path
     parsed = urlparse.urlparse(self.path)
-    path = parsed.path.split("/")
+    path = parsed.path.split('/')
     qwargs = urlparse.parse_qs(parsed.query)
 
     #Enforce one value per query string argument
@@ -179,70 +79,65 @@ class NaoHandler (BaseHTTPServer.BaseHTTPRequestHandler):
     
     reply = {}
     
-    if path[1] == "save":
-      wfile = open(SAVED_COMMANDS_FILE, "w")
-      wfile.write(self.rfile.read())
-      wfile.close()
-      reply["success"] = True
-    if path[1] == "code":
+    if path[1] == 'code':
       length = int(self.headers.getheader('content-length'))
       postvars = urlparse.parse_qs(self.rfile.read(length), keep_blank_values = 1)
-      code = urllib.unquote(postvars["code"][0])
+      code = urllib.unquote(postvars['code'][0])
       log = []
       interpreter.resetGlobalScope(log)
       lines = interpreter.fullParse(code)
       for line in lines:
         line.evaluate(interpreter.global_scope)
       print log
-      reply["success"] = True
-      reply["response"] = "\n".join(log)
-    elif path[1] == 'delbutton':
-      buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)["data"][0]))
-      buttonsfile = open('buttons.json')
-      contents = json.load(buttonsfile)
-      buttonsfile.close()
-      reply["success"] = False
-      if buttondata['name'] = contents:
-        del(contents[buttondata['name']])
-        wbuttonsfile = open('buttons.json', 'w')
-        wbuttonsfile.write(json.dumps(contents))
-        wbuttonsfile.close()
-	      reply["success"] = True
-    elif path[1] == 'addbutton':
-      buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)["data"][0]))
-      buttonsfile = open('buttons.json')
-      contents = json.load(buttonsfile)
-      buttonsfile.close()
-      reply["success"] = False
-      reply["nameerror"] = True
-      if not (buttondata['name'] in contents):
-        contents[buttondata['name']] = buttondata['commands']
-        wbuttonsfile = open('buttons.json', 'w')
-        wbuttonsfile.write(json.dumps(contents))
-        wbuttonsfile.close()
-        reply["success"] = True
-        reply["nameerror"] = False
-    elif path[1] == 'editbutton':
-      buttondata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)["data"][0]))
-      buttonsfile = open('buttons.json')
-      contents = json.load(buttonsfile)
-      buttonsfile.close()
-      reply["success"] = False
-      reply["nameerror"] = True
-      if buttondata['newname'] in contents: reply["nameerror"] = True
-      else:
-        if buttondata['oldname'] in contents: del(contents[buttondata['oldname']])
-        contents[buttondata['newname']] = buttondata['commands']
-        wbuttonsfile = open('buttons.json', 'w')
-        buttonsfile.write(json.dumps(contents))
-        wbuttonsfile.close()
+      reply['success'] = True
+      reply['response'] = '\n'.join(log)
+    elif path[1] == 'delprogram':
+      programdata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)['data'][0]))
+      programsfile = open('programs.json')
+      contents = json.load(programsfile)
+      programsfile.close()
+      reply['nameerror'] = True
+      if programdata['name'] in contents[programdata['username']]:
+        del(contents[programdata['username']][programdata['name']])
+        wprogramsfile = open('programs.json', 'w')
+        wprogramsfile.write(json.dumps(contents))
+        wprogramsfile.close()
+        reply['nameerror'] = False
+    elif path[1] == 'addprogram':
+      programdata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)['data'][0]))
+      programsfile = open('programs.json')
+      contents = json.load(programsfile)
+      programsfile.close()
+      reply['success'] = False
+      reply['nameerror'] = True
+      if not (programdata['name'] in contents[programdata['username']]):
+        contents[programdata['username']][programdata['name']] = programdata['commands']
+        wprogramsfile = open('programs.json', 'w')
+        wprogramsfile.write(json.dumps(contents))
+        wprogramsfile.close()
+        reply['success'] = True
+        reply['nameerror'] = False
+    elif path[1] == 'editprogram':
+      programdata = json.loads(urllib.unquote(urlparse.parse_qs(self.rfile.read(int(self.headers.getheader('content-length'))), keep_blank_values = 1)['data'][0]))
+      programsfile = open('programs.json')
+      contents = json.load(programsfile)
+      programsfile.close()
+      reply['success'] = False
+      reply['nameerror'] = True
+      if not (programdata['newname'] in contents[programdata['username']]) or programdata['newname'] == programdata['oldname']:
+        if programdata['oldname'] in contents[programdata['username']]: del(contents[programdata['username']][programdata['oldname']])
+        contents[programdata['username']][programdata['newname']] = programdata['commands']
+        wprogramsfile = open('programs.json', 'w')
+        programsfile.write(json.dumps(contents))
+        wprogramsfile.close()
+        reply['nameerror'] = False
 
     self.send_response(200)
-    self.send_header("Content-Type", "application/json")
+    self.send_header('Content-Type', 'application/json')
     self.end_headers()
     self.wfile.write(json.dumps(reply))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   ip_address = netproxy.getLocalIP()
   print 'Starting server on %s:8080' % ip_address
   httpd = BaseHTTPServer.HTTPServer(('', 8080), NaoHandler)

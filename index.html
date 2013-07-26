@@ -1,62 +1,61 @@
 <html>
   <head>
     <link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'/>
+    <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
       $(function () {
-        var buttons = [],
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/github");
+        editor.getSession().setMode("ace/mode/javascript");
+        editor.getSession().setTabSize(2);
+        editor.getSession().setUseWorker(false);
+        var username,
           log = $("div#log"),
-          buttonslist = $('div#buttons'),
+          programslist = $('div#programs'),
+          cleareditor = $('button#cleareditor'),
+          newebutton = $('button#newebutton'),
+          runbutton = $('button#runbutton'),
+          cancelbutton = $('button#cancelbutton'),
+          savebutton = $('button#savebutton'),
+          donebutton = $('button#donebutton'),
+          editortitle = $('span#editortitle'),
+          editornewname = $('span#editor_new_name'),
+          nameinput = $('input#new_ebutton_name'),
+          confirmbutton = $('button#confirm'),
+          shader = $('div.shader'),
+          confirmwindow = $('div.confirmation'),
           editortext,
-		  oldname
+          oldname;
 
-        function interpret(commands) {
-          var lines = commands.split("\n"),
-            rarray = [];
-          for (var i = 0; i < lines.length; i += 1) {
-            var index, key, srarray = [];
-            srarray.push("command=" + encodeURIComponent(lines[i].slice(0, index = lines[i].indexOf(" "))));
-            if (index === -1) {
-              rarray.push("command=" + encodeURIComponent(lines[i]));
-            } else {
-              params = lines[i].slice(index + 1).split(", ");
-              for (var x = 0; x < params.length; x += 1) {
-                key = params[x].slice(0, index = params[x].indexOf(" "));
-                value = encodeURIComponent(params[x].slice(index + 1));
-                srarray.push(key + "=" + value);
-              }
-              rarray.push(srarray.join("&"));
-            }
+        function createprogram(new_program_obj, real) {
+          var new_program_obj, new_program, failure;
+          if (real) {
+            $.ajax({
+              method: 'POST',
+              url: '/addprogram',
+              data: {
+                'data': JSON.stringify({"name": new_program_obj.name, "commands": new_program_obj.commands, "username": username})
+              },
+              dataType: "json",
+              success: (function() {
+                return function(server_response) {
+                  failure = server_response.nameerror;
+                  if (!failure) createprogram(new_program_obj, false);
+                  return failure;
+                }
+              }())
+            });
           }
-          return rarray;
-        }
-        function createbutton(new_button_obj) {
-          var new_button_obj, new_button, nindex = buttons.length, failure;
-          buttons.push(new_button_obj);
-          $.ajax({
-            method: 'POST',
-			async: false,
-            url: '/addbutton',
-            data: {
-              'data': JSON.stringify({"name": new_button_obj.name, "commands": new_button_obj.commands})
-            },
-            dataType: "json",
-			success: (function() {
-			  return function(server_reponse) {
-			    failure = server_response.nameerror;
-			  }
-			 }())
-          });
-		  if (failure) return false;
-          buttonslist.append(new_button = $("<div>").addClass("button").attr("title", new_button_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
-            log_div = $("<div>").addClass("log").text("[" + new_button_obj.name + "]");
+          programslist.append(new_program = $("<div>").addClass("program").attr("title", new_program_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
+            log_div = $("<div>").addClass("log").text("[" + new_program_obj.name + "]");
             log.append(log_div);
             log_div[0].scrollIntoView(false);
             $.ajax({
               method: 'POST',
               url: '/code',
               data: {
-                'code': new_button_obj.commands
+                'code': new_program_obj.commands
               },
               dataType: 'json',
               success: (function(log_div) {
@@ -71,153 +70,150 @@
               }(log_div))
             });
           })).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
-            if (new_button.children('.edit').text() == 'E') {
+            if (new_program.children('.edit').text() == 'E') {
               var editbuttons = $('.edit');
               for (var i = 0; i < editbuttons.length; i++) {
                 if (editbuttons.eq(i).text() == 'C') editbuttons.eq(i).click();
               }
               editortext = editor.getValue();
-              $('input#new_ebutton_name').val(new_button_obj.name);
-              editor.setValue(new_button_obj.commands);
-              new_button.children('.edit').text('C').attr('title', 'Cancel');
-              new_button.children('.run').hide();
-              $('button#cleareditor').hide();
-              $('button#newebutton').hide();
-              $('button#runbutton').hide();
-              $('button#cancelbutton').hide();
-              $('button#savebutton').hide();
-              $('button#donebutton').show();
-              $('span#editortitle').hide();
-              $('span#editor_new_name').show();
-              $('input#new_ebutton_name').select();
-              $('button#donebutton').unbind('click');
-			  oldname = new_button_obj.name;
-              $('button#donebutton').click(function() {
-                new_button_obj.name = $('input#new_ebutton_name').val();
-                new_button.children('.button_title').text(new_button_obj.name);
-                new_button_obj.commands = editor.getValue();
-                new_button.attr('title', new_button_obj.commands);
+              nameinput.val(new_program_obj.name);
+              editor.setValue(new_program_obj.commands);
+              new_program.children('.edit').text('C').attr('title', 'Cancel');
+              new_program.children('.run').hide();
+              cleareditor.hide();
+              newebutton.hide();
+              runbutton.hide();
+              cancelbutton.hide();
+              savebutton.hide();
+              donebutton.show();
+              editortitle.hide();
+              editornewname.show();
+              nameinput.select();
+              donebutton.unbind('click');
+              oldname = new_program_obj.name;
+              donebutton.click(function() {
+                new_program_obj.name = nameinput.val();
+                new_program.children('.program_title').text(new_program_obj.name);
+                new_program_obj.commands = editor.getValue();
+                new_program.attr('title', new_program_obj.commands);
                 $.ajax({
-				  method: 'POST',
-				  url: '/editbutton',
-				  data: {
-					'data': JSON.stringify({"oldname": oldname, "newname": new_button_obj.name, "commands": new_button_obj.commands})
-				  },
-				  dataType: "json",
-				  success: (function() {
-				    return function(server_response) {
-					  failure = server_response.nameerror;
-					}
-				  }())
-				});
-				if (failure) alert ('This button name is already in use, please name yours something else.');
-				else {
+                  method: 'POST',
+                  async: false,
+                  url: '/editprogram',
+                  data: {
+                    'data': JSON.stringify({"oldname": oldname, "newname": new_program_obj.name, "commands": new_program_obj.commands, "username": username})
+                  },
+                  dataType: "json",
+                  success: (function() {
+                    return function(server_response) {
+                      failure = server_response.nameerror;
+                    }
+                  }())
+                });
+                if (failure) alert ('This program name is already in use, please name yours something else.');
+                else {
                   editor.setValue(editortext);
-                  new_button.children('.edit').text('E').attr('title', 'Edit');
-                  new_button.children('.run').show();
-                  $('input#new_ebutton_name').val('');
-                  $('span#editor_new_name').hide();
-                  $('span#editortitle').show();
-                  $('button#donebutton').hide();
-                  $('button#cleareditor').show();
-                  $('button#newebutton').show();
-				}
+                  new_program.children('.edit').text('E').attr('title', 'Edit');
+                  new_program.children('.run').show();
+                  nameinput.val('');
+                  editornewname.hide();
+                  editortitle.show();
+                  donebutton.hide();
+                  cleareditor.show();
+                  newebutton.show();
+                }
               });
             }
             else {
               editor.setValue(editortext);
-              new_button.children('.edit').text('E').attr('title', 'Edit');
-              new_button.children('.run').show();
-              $('input#new_ebutton_name').val('');
-              $('span#editor_new_name').hide();
-              $('span#editortitle').show();
-              $('button#donebutton').hide();
-              $('button#cleareditor').show();
-              $('button#newebutton').show();
+              new_program.children('.edit').text('E').attr('title', 'Edit');
+              new_program.children('.run').show();
+              nameinput.val('');
+              editornewname.hide();
+              editortitle.show();
+              donebutton.hide();
+              cleareditor.show();
+              newebutton.show();
             }
           })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
-            $('div.shader').show();
-            $('div.confirmation').show();
-            $('button#confirm').unbind('click');
-            $('button#confirm').click(function() {
-              new_button.remove();
-              buttons.splice(nindex, 1);
+            shader.show();
+            confirmwindow.show();
+            confirmbutton.unbind('click');
+            confirmbutton.click(function() {
+              new_program.remove();
               $.ajax({
               	method: 'POST',
-              	url: '/delbutton',
+              	url: '/delprogram',
               	data: {
-              		'data': JSON.stringify({'name': new_button_obj.name})
+              		'data': JSON.stringify({"name": new_program_obj.name, "username": username})
               	},
               	dataType: 'json'
               });
-              $('div.confirmation').hide();
-              $('div.shader').hide();
+              confirmwindow.hide();
+              shader.hide();
             });
-          })).append($('<div>').addClass('button_title').text(new_button_obj.name)));
-		  return true;
+          })).append($('<div>').addClass('program_title').text(new_program_obj.name)));
         }
         
         $('button#clearconsole').click(function () {
           if (log.children().length != 0) {
-            $('div.shader').show();
-            $('div.confirmation').show();
-            $('button#confirm').unbind('click');
-            $('button#confirm').click(function() {
+            shader.show();
+            confirmwindow.show();
+            confirmbutton.unbind('click');
+            confirmbutton.click(function() {
               log.html('');
-              $('div.confirmation').hide();
-              $('div.shader').hide();
+              confirmwindow.hide();
+              shader.hide();
             });
           }
         });
-        $('button#cleareditor').click(function() {
+        cleareditor.click(function() {
           if (editor.getValue() != '') {
-            $('div.shader').show();
-            $('div.confirmation').show();
-            $('button#confirm').unbind('click');
-            $('button#confirm').click(function() {
+            shader.show();
+            confirmwindow.show();
+            confirmbutton.unbind('click');
+            confirmbutton.click(function() {
               editor.setValue('');
-              $('div.confirmation').hide();
-              $('div.shader').hide();
+              confirmwindow.hide();
+              shader.hide();
             });
           }
         });
-        $('button#newebutton').click(function() {
-          $('button#cleareditor').hide();
-          $('button#newebutton').hide();
-          $('button#runbutton').hide();
-          $('button#cancelbutton').show()
-          $('button#savebutton').show()
-          $('span#editortitle').hide();
-          $('span#editor_new_name').show();
-          $('input#new_ebutton_name').select();
+        newebutton.click(function() {
+          cleareditor.hide();
+          newebutton.hide();
+          runbutton.hide();
+          cancelbutton.show()
+          savebutton.show()
+          editortitle.hide();
+          editornewname.show();
+          nameinput.select();
         });
-        $('button#savebutton').click(function() {
-          if (createbutton({'name': $('input#new_ebutton_name').val(), 'commands': editor.getValue()})) {
-		    $('input#new_ebutton_name').val('');
-            $('span#editor_new_name').hide();
-            $('span#editortitle').show();
-            $('button#cancelbutton').hide();
-            $('button#savebutton').hide();
-            $('button#cleareditor').show();
-            $('button#newebutton').show();
-            $('button#runbutton').show();
+        savebutton.click(function() {
+          if (createprogram({'name': nameinput.val(), 'commands': editor.getValue()}, true)) {
+            nameinput.val('');
+            editornewname.hide();
+            editortitle.show();
+            cancelbutton.hide();
+            savebutton.hide();
+            cleareditor.show();
+            newebutton.show();
+            runbutton.show();
             editor.setValue('');
-		  }
-		  else {
-			alert ('This button name is already in use, please name yours something else.');
-		  }
+		      }
+		      else alert ('This program name is already in use, please name yours something else.');
         });
-        $('button#cancelbutton').click(function() {
-          $('input#new_ebutton_name').val('');
-          $('span#editor_new_name').hide();
-          $('span#editortitle').show();
-          $('button#cancelbutton').hide();
-          $('button#savebutton').hide();
-          $('button#cleareditor').show();
-          $('button#newebutton').show();
-          $('button#runbutton').show();
+        cancelbutton.click(function() {
+          nameinput.val('');
+          editornewname.hide();
+          editortitle.show();
+          cancelbutton.hide();
+          savebutton.hide();
+          cleareditor.show();
+          newebutton.show();
+          runbutton.show();
         });
-        $('button#runbutton').click(function() {
+        runbutton.click(function() {
           log_div = $("<div>").addClass("log").text("[Editor]");
           log.append(log_div);
           log_div[0].scrollIntoView(false);
@@ -241,21 +237,26 @@
           });
         });
         $('button#deny').click(function() {
-          $('div.confirmation').hide();
-          $('div.shader').hide();
+          confirmwindow.hide();
+          shader.hide();
         });
-        var buttonsjson;
-        $.ajax({
-          url: '/getbuttons',
-          datatype: 'json',
-          success: (function() {
-            return function(server_response) {
-              buttonsjson = server_response;
-              for (key in buttonsjson) {
-                createbutton({'name': key, 'commands': buttonsjson[key]});
+        $('button#login').click(function() {
+        	$('div.shader_white').hide();
+        	$('div.login').hide();
+        	username = $('input.login').val();
+          $.ajax({
+            url: '/getprograms?username=' + username,
+            datatype: 'json',
+            success: (function() {
+              return function(server_response) {
+                var buttonsjson = server_response;
+                for (key in buttonsjson) {
+                  console.log(key);
+                  createprogram({'name': key, 'commands': buttonsjson[key]}, false);
+                }
               }
-            }
-          }())
+            }())
+          });
         });
       })
     </script>
@@ -289,7 +290,7 @@
         background:#FFF;
         overflow:auto;
       }
-      div.button {
+      div.program {
         height:50px;
         line-height:50px;
         cursor:pointer;
@@ -300,16 +301,16 @@
         color:#000;
         padding:10px;
       }
-      div.button:nth-of-type(odd) {
+      div.program:nth-of-type(odd) {
         background:#EEE;
       }
-      div.button:nth-of-type(even) {
+      div.program:nth-of-type(even) {
         background:#CCC;
       }
-      div.button:nth-of-type(odd):hover {
+      div.program:nth-of-type(odd):hover {
         background:#DDD;
       }
-			div.button:nth-of-type(even):hover {
+			div.program:nth-of-type(even):hover {
         background:#BBB;
       }
       .init_hidden {
@@ -339,25 +340,11 @@
         border:1px solid #000;
         transition:background .3s ease-in;
       }
-      div#button_list {
-        left:0;
-        right:0;
+      div#program_list {
+        left:0px;
+        right:0px;
         top:0px;
         bottom:0;
-      }
-      div.running#button_list {
-        top:320px;
-      }
-      span.prompt {
-        width:50px;
-      }
-      textarea.field {
-        border:1px solid #888;
-        width:100%;
-        height:100px;
-        font-family:monospace;
-        outline:none;
-        resize:none;
       }
       div.blockish#big_wrapper {
         top:0;
@@ -411,17 +398,7 @@
       button.run:hover {
         background:#00F;
       }
-      div.adialogged {
-        height:150px;
-        background:#FFF;
-        overflow:auto;
-      }
-      div.bdialogged {
-        height:100px;
-        background:#FFF;
-        overflow:auto;
-      }
-      div.fillbuttonheader {
+      div.fillprogramheader {
         position:relative;
         top:0px;
         left:0px;
@@ -429,7 +406,7 @@
         height:25px;
         background:#EEE;
       }
-      div.buttonheader {
+      div.programheader {
         font-size:20px;
         font-family:'Lato';
         position:fixed;
@@ -571,7 +548,17 @@
         left:0px;
         right:0px;
         bottom:0px;
-        background:rgba(100, 100, 100, 0.7)
+        background:rgba(100, 100, 100, 0.7);
+      }
+      div.shader_white {
+        position:fixed;
+        top:0px;
+        left:0px;
+        right:0px;
+        bottom:0px;
+        background:rgba(100, 100, 100, 0.7);
+        background:#EEE;
+        z-index:500;
       }
       div.confirmation {
         font-size:20px;
@@ -585,6 +572,20 @@
         text-align:center;
         box-shadow:0px 0px 2px 2px #444;
         background:#FFF;
+      }
+      div.login {
+        font-size:20px;
+        position:absolute;
+        width:200px;
+        height:200px;
+        top:50%;
+        left:50%;
+        margin-top:-100px;
+        margin-left:-100px;
+        text-align:center;
+        box-shadow:0px 0px 2px 2px #444;
+        background:#FFF;
+        z-index:1000;
       }
       button#confirm {
         position:absolute;
@@ -607,29 +608,53 @@
       button#deny:hover {
         background:#F00;
       }
+      button#login {
+        position:absolute;
+        top:150px;
+        right:20px;
+        width:30px;
+        height:30px;
+        background:#007100;
+      }
+      button#login:hover {
+        background:#0F0;
+      }
       span.confirmtext {
         position:relative;
         top:65px;
       }
-	  div#buttons {
-	    position:absolute;
-		top:71px;
-		left:0px;
-		right:0px;
-		bottom:0px;
-	    overflow:auto;
-	  }
+      span.logintext {
+        position:relative;
+        top:65px;
+      }
+	    div#programs {
+	      position:absolute;
+	      top:71px;
+	      left:0px;
+	      right:0px;
+	      bottom:0px;
+	      overflow:auto;
+	    }
+	    input.login {
+	      width:150px;
+	      position:relative;
+	      top:80px;
+	    }
     </style>
   </head>
   <body>
     <div class="blockish" id="big_wrapper">
+      <div class="shader_white"></div>
+      <div class="login">
+        <span class="logintext">Username?</span>
+        <input class="field login" />
+        <button id="login" class="field" title="Login">L</button>
+      </div>
       <div class="blockish" id="left_wrap">
-        <div id="button_list">
-          <div id="root">
-            <div class="fillbuttonheader"></div>
-            <div class="buttonheader">Programs</div>
-            <div id="buttons"></div>
-          </div>
+        <div id="program_list">
+          <div class="fillprogramheader"></div>
+          <div class="programheader">Programs</div>
+          <div id="programs"></div>
         </div>
       </div>
       <div class="blockish" id="right_wrap">
@@ -646,14 +671,6 @@
             <button id="cleareditor" class="field" title="Clear">C</button>
           </div>
           <div id="editor" class="blockish"></div>
-          <script src="src-noconflict/ace.js"></script>
-          <script>
-            var editor = ace.edit("editor");
-            editor.setTheme("ace/theme/github");
-            editor.getSession().setMode("ace/mode/javascript");
-            editor.getSession().setTabSize(2);
-            editor.getSession().setUseWorker(false);
-          </script>
         </div>
         <div class="blockish" id="console">
           <div class="fillconsoleheader"></div>
