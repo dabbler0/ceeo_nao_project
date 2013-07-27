@@ -113,10 +113,6 @@
                 donebutton.unbind('click');
                 oldname = new_program_obj.name;
                 donebutton.click(function() {
-                  new_program_obj.name = nameinput.val();
-                  new_program.children('.program_title').text(new_program_obj.name);
-                  new_program_obj.commands = editor.getValue();
-                  new_program.attr('title', new_program_obj.commands);
                   $.ajax({
                     method: 'POST',
                     url: '/editprogram',
@@ -133,6 +129,10 @@
                         }, 700);
                         if (failure) alert ('This program name is already in use, please name yours something else.');
                         else {
+                          new_program_obj.name = nameinput.val();
+                          new_program.children('.program_title').text(new_program_obj.name);
+                          new_program_obj.commands = editor.getValue();
+                          new_program.attr('title', new_program_obj.commands);
                           editor.setValue(editortext);
                           new_program.children('.edit').text('E').attr('title', 'Edit');
                           new_program.children('.run').show();
