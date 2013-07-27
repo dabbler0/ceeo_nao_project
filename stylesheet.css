@@ -1,0 +1,385 @@
+body,html {
+  background:#EEE;
+  overflow:hidden;
+  font-family:Lato, Verdana, Arial, sans-serif;
+  margin:0;
+  padding:0;
+}
+div.blockish {
+  position:absolute;
+}
+div.blockish#left_wrap {
+  left:0;
+  top:0;
+  bottom:0;
+  width:350px;
+  box-shadow:1px 0 1px #888 inset;
+}
+div.blockish#right_wrap {
+  top:0;
+  bottom:0;
+  right:0;
+  left:350px;
+  border-left:1px solid #888;
+  overflow:auto;
+}
+div#left_wrap {
+  background:#FFF;
+  overflow:auto;
+}
+div.program {
+  height:50px;
+  line-height:50px;
+  cursor:pointer;
+  font-size:20px;
+  border-bottom:1px solid #888;
+  box-shadow:1px 0 1px #888 inset;
+  transition:background .3s ease-in, height .3s ease-in, color .3s ease-in;
+  color:#000;
+  padding:10px;
+}
+div.program:nth-of-type(odd) {
+  background:#EEE;
+}
+div.program:nth-of-type(even) {
+  background:#CCC;
+}
+div.program:nth-of-type(odd):hover {
+  background:#DDD;
+}
+div.program:nth-of-type(even):hover {
+  background:#BBB;
+}
+.init_hidden {
+  display:none;
+}
+input.field {
+  height:30px;
+  width:200px;
+  line-height:30px;
+  font-family:Lato, Verdana, Arial, sans-serif;
+  font-size:15px;
+  border:1px solid #888;
+  transition:box-shadow .3s ease-in;
+  outline:none;
+}
+input.field:focus {
+  box-shadow:0px 0px 2px #888 inset;
+}
+button.field {
+  background:#710000;
+  font-family:Lato, Verdana, Arial, sans-serif;
+  color:#FFF;
+  font-size:12px;
+  line-height:20px;
+  text-transform:uppercase;
+  cursor:hand;
+  border:1px solid #000;
+  transition:background .3s ease-in;
+}
+div#program_list {
+  left:0px;
+  right:0px;
+  top:0px;
+  bottom:0;
+}
+div.blockish#big_wrapper {
+  top:0;
+  bottom:0;
+  right:0;
+  left:0;
+  overflow:auto;
+}
+div.console {
+  top:0;
+  bottom:0;
+  right:0;
+  left:0;
+  position:absolute;
+  padding:5px;
+}
+div.indented {
+  padding-left:10px;
+}
+div.monospace {
+  font-family:'Courier New';
+  font-size:13px;
+  white-space:pre;
+}
+button.delete {
+  position:absolute;
+  right:9px;
+  width:30px;
+  height:30px;
+}
+button.delete:hover {
+  background:#F00;
+}
+button.edit {
+  position:absolute;
+  right:48px;
+  width:30px;
+  height:30px;
+  background:#007100;
+}
+button.edit:hover {
+  background:#0F0;
+}
+button.run {
+  position:absolute;
+  right:87px;
+  width:30px;
+  height:30px;
+  background:#000071;
+}
+button.run:hover {
+  background:#00F;
+}
+div.fillprogramheader {
+  position:relative;
+  top:0px;
+  left:0px;
+  width:350px;
+  height:25px;
+  background:#EEE;
+}
+div.programheader {
+  font-size:20px;
+  font-family:'Lato';
+  position:fixed;
+  top:25px;
+  left:0px;
+  width:350px;
+  height:45px;
+  border-bottom:1px solid #888;
+  text-align:center;
+  background:#EEE;
+}
+div.filleditorheader {
+  position:relative;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:25px;
+  background:#EEE;
+}
+div.editorheader {
+  font-size:20px;
+  font-family:'Lato';
+  position:relative;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:45px;
+  border-bottom:1px solid #888;
+  text-align:center;
+  background:#EEE;
+}
+div.fillconsoleheader {
+  position:relative;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:25px;
+  background:#EEE;
+}
+div.consoleheader {
+  font-size:20px;
+  font-family:'Lato';
+  position:relative;
+  top:0px;
+  left:0px;
+  width:100%;
+  height:45px;
+  border-bottom:1px solid #888;
+  text-align:center;
+  background:#EEE;
+}
+div#log {
+  position:absolute;
+  top:70px;
+  bottom:0;
+  width:100%;
+  overflow:auto;
+}
+div#editor_wrap {
+  top:0px;
+  bottom:50%;
+  width:100%;
+  background:#FFF;
+}
+div#editor {
+  z-index:0;
+  top:71px;
+  bottom:0px;
+  left:0px;
+  right:0px;
+}
+div#console {
+  border-top:1px solid #888;
+  top:50%;
+  bottom:0px;
+  width:100%;
+  background:#FFF;
+}
+button#clearconsole, button#cleareditor {
+  position:absolute;
+  top:-16px;
+  right:9px;
+  width:30px;
+  height:30px;
+  background:#710000;
+}
+button#newebutton {
+  position:absolute;
+  top:-16px;
+  right:48px;
+  width:30px;
+  height:30px;
+  background:#007100;
+}
+button#savebutton {
+  position:absolute;
+  top:-16px;
+  right:48px;
+  width:30px;
+  height:30px;
+  background:#007100;
+}
+button#cancelbutton {
+  position:absolute;
+  top:-16px;
+  right:9px;
+  width:30px;
+  height:30px;
+  background:#710000;
+}
+button#runbutton {
+  position:absolute;
+  top:-16px;
+  right:87px;
+  width:30px;
+  height:30px;
+  background:#000071;
+}
+button#donebutton {
+  position:absolute;
+  top:-16px;
+  right:9px;
+  width:30px;
+  height:30px;
+  background:#007100;
+}
+button#clearconsole:hover, button#cleareditor:hover, button#cancelbutton:hover {
+  background:#F00;
+}
+button#newebutton:hover, button#savebutton:hover, button#donebutton:hover {
+  background:#0F0;
+}
+button#runbutton:hover {
+  background:#00F;
+}
+div.shader {
+  position:fixed;
+  top:0px;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  background:rgba(100, 100, 100, 0.7);
+}
+div.shader_white {
+  position:fixed;
+  top:0px;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  background:rgba(100, 100, 100, 0.7);
+  background:#EEE;
+  z-index:500;
+}
+div.confirmation {
+  font-size:20px;
+  position:absolute;
+  width:200px;
+  height:200px;
+  top:50%;
+  left:50%;
+  margin-top:-100px;
+  margin-left:-100px;
+  text-align:center;
+  box-shadow:0px 0px 2px 2px #444;
+  background:#FFF;
+}
+div.login {
+  font-size:20px;
+  position:absolute;
+  width:200px;
+  height:200px;
+  top:50%;
+  left:50%;
+  margin-top:-100px;
+  margin-left:-100px;
+  text-align:center;
+  box-shadow:0px 0px 2px 2px #444;
+  background:#FFF;
+  z-index:1000;
+}
+button#confirm {
+  position:absolute;
+  top:150px;
+  left:20px;
+  width:30px;
+  height:30px;
+  background:#007100;
+}
+button#confirm:hover {
+  background:#0F0;
+}
+button#deny {
+  position:absolute;
+  top:150px;
+  right:20px;
+  width:30px;
+  height:30px;
+}
+button#deny:hover {
+  background:#F00;
+}
+button#login {
+  position:absolute;
+  top:150px;
+  right:20px;
+  width:30px;
+  height:30px;
+  background:#007100;
+}
+button#login:hover {
+  background:#0F0;
+}
+span.confirmtext {
+  position:relative;
+  top:65px;
+}
+span.logintext {
+  position:relative;
+  top:65px;
+}
+div#programs {
+  position:absolute;
+  top:71px;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  overflow:auto;
+}
+input.login {
+  width:150px;
+  position:relative;
+  top:80px;
+}
+span#sync {
+  position:absolute;
+  left: 10px;
+  color:#999;
+  transition:opacity 0.3s ease-in;
+}

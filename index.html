@@ -1,18 +1,20 @@
 <html>
   <head>
     <link href='http://fonts.googleapis.com/css?family=Lato:300,400' rel='stylesheet' type='text/css'/>
-    <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <link href='stylesheet.css' rel='stylesheet' type='text/css'/>
+    <script src='http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js'></script>
+    <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js'></script>
     <script>
       $(function () {
-        var editor = ace.edit("editor"); //create editor and bind to the the element with id 'editor'
-        editor.setTheme("ace/theme/github");
-        editor.getSession().setMode("ace/mode/javascript");
+        var editor = ace.edit('editor'); //create editor and bind to the the element with id 'editor'
+        editor.setTheme('ace/theme/github');
+        editor.getSession().setMode('ace/mode/javascript');
         editor.getSession().setTabSize(2);
         editor.getSession().setUseWorker(false);
         var username,
-          log = $("div#log"),
+          log = $('div#log'),
           programslist = $('div#programs'),
+          sync = $('span#sync'),
           cleareditor = $('button#cleareditor'),
           newebutton = $('button#newebutton'),
           runbutton = $('button#runbutton'),
@@ -36,26 +38,37 @@
               method: 'POST',
               url: '/addprogram',
               data: {
-                'data': JSON.stringify({"name": new_program_obj.name, "commands": new_program_obj.commands, "username": username})
+                'data': JSON.stringify({'name': new_program_obj.name, 'commands': new_program_obj.commands, 'username': username})
               },
-              dataType: "json",
+              dataType: 'json',
               success: (function() {
                 return function(server_response) {
                   success = server_response.success;
-                  if (success) createprogram(new_program_obj, false); //if there is no problem creating the button server-side, create the button without checking again to see if the server thinks it's okay
-                  $('span#sync').text('Done');
-                  setTimeout(function() {
-                  	$('span#sync').text('');
-                  }, 1000);
-                  return success; //return whether the create succeeded on a server
+                  if (success) {
+                    createprogram(new_program_obj, false); //if there is no problem creating the button server-side, create the button without checking again to see if the server thinks it's okay
+                    nameinput.val('');
+                    editornewname.hide();
+                    editortitle.show();
+                    cancelbutton.hide();
+                    savebutton.hide();
+                    cleareditor.show();
+                    newebutton.show();
+                    runbutton.show();
+                    editor.setValue('');
+                    sync.text('Done');
+                    setTimeout(function() {
+                      sync.css('opacity', '0');
+                    }, 700);
+                  }
+                  else alert ('This program name is already in use, please name yours something else.');
                 }
               }())
             });
-            $('span#sync').text('Syncing...');
+            sync.text('Syncing...').css('opacity', '100');
           }
           else {
-            programslist.append(new_program = $("<div>").addClass("program").attr("title", new_program_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
-              log_div = $("<div>").addClass("log").text("[" + new_program_obj.name + "]");
+/*RUN*/     programslist.append(new_program = $('<div>').addClass('program').attr('title', new_program_obj.commands).append($('<button>').addClass('run').addClass('field').text('R').attr('title', 'Run').click(function () {
+              log_div = $('<div>').addClass('log').text('[' + new_program_obj.name + ']');
               log.append(log_div);
               log_div[0].scrollIntoView(false);
               $.ajax({
@@ -69,14 +82,14 @@
                   return function(server_response) {
                     log_div.append($('<div>').addClass('indented').css('color', '#00F').text(server_response.response));
                     if (server_response.success)
-                      log_div.append($('<div>').addClass('indented').css('color', '#0F0').text("Success"));
+                      log_div.append($('<div>').addClass('indented').css('color', '#0F0').text('Success'));
                     else
-                      log_div.append($('<div>').addClass('indented').css('color', '#F00').text("Failure"));
+                      log_div.append($('<div>').addClass('indented').css('color', '#F00').text('Failure'));
                     log_div.children().last()[0].scrollIntoView(false);
                   }
                 }(log_div))
               });
-            })).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
+/*EDIT*/    })).append($('<button>').addClass('edit').addClass('field').text('E').attr('title', 'Edit').click(function() {
               if (new_program.children('.edit').text() == 'E') {
                 //CLEAN-UP - end all other edit functions and clean up their mess
                 editor.setValue(editortext);
@@ -108,16 +121,16 @@
                     method: 'POST',
                     url: '/editprogram',
                     data: {
-                      'data': JSON.stringify({"oldname": oldname, "newname": new_program_obj.name, "commands": new_program_obj.commands, "username": username})
+                      'data': JSON.stringify({'oldname': oldname, 'newname': new_program_obj.name, 'commands': new_program_obj.commands, 'username': username})
                     },
-                    dataType: "json",
+                    dataType: 'json',
                     success: (function() {
                       return function(server_response) {
                         failure = server_response.nameerror;
-                        $('span#sync').text('Done');
+                        sync.text('Done');
                         setTimeout(function() {
-                          $('span#sync').text('');
-                        }, 1000);
+                          sync.css('opacity', '0');
+                        }, 700);
                         if (failure) alert ('This program name is already in use, please name yours something else.');
                         else {
                           editor.setValue(editortext);
@@ -133,7 +146,7 @@
                       }
                     }())
                   });
-                  $('span#sync').text('Syncing...');
+                  sync.text('Syncing...').css('opacity', '100');
                 });
               }
               else {
@@ -147,7 +160,7 @@
                 cleareditor.show();
                 newebutton.show();
               }
-            })).append($("<button>").addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
+/*DELETE*/  })).append($('<button>').addClass('delete').addClass('field').text('D').attr('title', 'Delete').click(function() {
               shader.show();
               confirmwindow.show();
               confirmbutton.unbind('click');
@@ -157,19 +170,19 @@
                 	method: 'POST',
                 	url: '/delprogram',
                 	data: {
-                		'data': JSON.stringify({"name": new_program_obj.name, "username": username})
+                		'data': JSON.stringify({'name': new_program_obj.name, 'username': username})
                 	},
                 	dataType: 'json',
                 	success: (function() {
                 		return function() {
-                			$('span#sync').text('Done');
+                			sync.text('Done');
                       setTimeout(function() {
-                      	$('span#sync').text('');
-                      }, 1000);
+                      	sync.css('opacity', '0');
+                      }, 700);
                     }
                   }())
                 });
-                $('span#sync').text('Syncing...');
+                sync.text('Syncing...').css('opacity', '100');
                 confirmwindow.hide();
                 shader.hide();
               });
@@ -177,6 +190,28 @@
           }
         }
         
+        $('button#login').click(function() {
+        	$('div.shader_white').hide();
+        	$('div.login').hide();
+        	username = $('input.login').val();
+          $.ajax({
+            url: '/getprograms?username=' + username,
+            datatype: 'json',
+            success: (function() {
+              return function(server_response) {
+                var buttonsjson = server_response;
+                for (key in buttonsjson) {
+                  createprogram({'name': key, 'commands': buttonsjson[key]}, false);
+                }
+                sync.text('Done');
+                setTimeout(function() {
+                  sync.css('opacity', '0');
+                }, 700);
+              }
+            }())
+          });
+          sync.text('Syncing...').css('opacity', '100');
+        });
         $('button#clearconsole').click(function () {
           if (log.children().length != 0) {
             shader.show();
@@ -205,25 +240,14 @@
           cleareditor.hide();
           newebutton.hide();
           runbutton.hide();
-          cancelbutton.show()
-          savebutton.show()
+          cancelbutton.show();
+          savebutton.show();
           editortitle.hide();
           editornewname.show();
           nameinput.select();
         });
         savebutton.click(function() {
-          if (createprogram({'name': nameinput.val(), 'commands': editor.getValue()}, true)) {
-            nameinput.val('');
-            editornewname.hide();
-            editortitle.show();
-            cancelbutton.hide();
-            savebutton.hide();
-            cleareditor.show();
-            newebutton.show();
-            runbutton.show();
-            editor.setValue('');
-		      }
-		      else alert ('This program name is already in use, please name yours something else.');
+          createprogram({'name': nameinput.val(), 'commands': editor.getValue()}, true);
         });
         cancelbutton.click(function() {
           nameinput.val('');
@@ -236,7 +260,7 @@
           runbutton.show();
         });
         runbutton.click(function() {
-          log_div = $("<div>").addClass("log").text("[Editor]");
+          log_div = $('<div>').addClass('log').text('[Editor]');
           log.append(log_div);
           log_div[0].scrollIntoView(false);
           $.ajax({
@@ -250,9 +274,9 @@
               return function(server_response) {
                 log_div.append($('<div>').addClass('indented').css('color', '#00F').text(server_response.response));
                   if (server_response.success)
-                    log_div.append($('<div>').addClass('indented').css('color', '#0F0').text("Success"));
+                    log_div.append($('<div>').addClass('indented').css('color', '#0F0').text('Success'));
                   else
-                    log_div.append($('<div>').addClass('indented').css('color', '#F00').text("Failure"));
+                    log_div.append($('<div>').addClass('indented').css('color', '#F00').text('Failure'));
                 log_div.children().last()[0].scrollIntoView(false);
               }
             }(log_div))
@@ -262,462 +286,54 @@
           confirmwindow.hide();
           shader.hide();
         });
-        $('button#login').click(function() {
-        	$('div.shader_white').hide();
-        	$('div.login').hide();
-        	username = $('input.login').val();
-          $.ajax({
-            url: '/getprograms?username=' + username,
-            datatype: 'json',
-            success: (function() {
-              return function(server_response) {
-                var buttonsjson = server_response;
-                for (key in buttonsjson) {
-                  createprogram({'name': key, 'commands': buttonsjson[key]}, false);
-                }
-                $('span#sync').text('Done');
-                setTimeout(function() {
-                  $('span#sync').text('');
-                }, 1000);
-              }
-            }())
-          });
-          $('span#sync').text('Syncing...');
-        });
-      })
+      });
     </script>
-    <style>
-      body,html {
-        background:#EEE;
-        overflow:hidden;
-        font-family:Lato, Verdana, Arial, sans-serif;
-        margin:0;
-        padding:0;
-      }
-      div.blockish {
-        position:absolute;
-      }
-      div.blockish#left_wrap {
-        left:0;
-        top:0;
-        bottom:0;
-        width:350px;
-        box-shadow:1px 0 1px #888 inset;
-      }
-      div.blockish#right_wrap {
-        top:0;
-        bottom:0;
-        right:0;
-        left:350px;
-        border-left:1px solid #888;
-        overflow:auto;
-      }
-      div#left_wrap {
-        background:#FFF;
-        overflow:auto;
-      }
-      div.program {
-        height:50px;
-        line-height:50px;
-        cursor:pointer;
-        font-size:20px;
-        border-bottom:1px solid #888;
-        box-shadow:1px 0 1px #888 inset;
-        transition:background .3s ease-in, height .3s ease-in, color .3s ease-in;
-        color:#000;
-        padding:10px;
-      }
-      div.program:nth-of-type(odd) {
-        background:#EEE;
-      }
-      div.program:nth-of-type(even) {
-        background:#CCC;
-      }
-      div.program:nth-of-type(odd):hover {
-        background:#DDD;
-      }
-			div.program:nth-of-type(even):hover {
-        background:#BBB;
-      }
-      .init_hidden {
-        display:none;
-      }
-      input.field {
-        height:30px;
-        width:200px;
-        line-height:30px;
-        font-family:Lato, Verdana, Arial, sans-serif;
-        font-size:15px;
-        border:1px solid #888;
-        transition:box-shadow .3s ease-in;
-        outline:none;
-      }
-      input.field:focus {
-        box-shadow:0px 0px 2px #888 inset;
-      }
-			button.field {
-        background:#710000;
-        font-family:Lato, Verdana, Arial, sans-serif;
-        color:#FFF;
-        font-size:12px;
-        line-height:20px;
-        text-transform:uppercase;
-        cursor:hand;
-        border:1px solid #000;
-        transition:background .3s ease-in;
-      }
-      div#program_list {
-        left:0px;
-        right:0px;
-        top:0px;
-        bottom:0;
-      }
-      div.blockish#big_wrapper {
-        top:0;
-        bottom:0;
-        right:0;
-        left:0;
-        overflow:auto;
-      }
-      div.console {
-        top:0;
-        bottom:0;
-        right:0;
-        left:0;
-        position:absolute;
-        padding:5px;
-      }
-      div.indented {
-        padding-left:10px;
-      }
-      div.monospace {
-        font-family:'Courier New';
-        font-size:13px;
-        white-space:pre;
-      }
-      button.delete {
-        position:absolute;
-        right:9px;
-        width:30px;
-        height:30px;
-      }
-      button.delete:hover {
-        background:#F00;
-      }
-      button.edit {
-        position:absolute;
-        right:48px;
-        width:30px;
-        height:30px;
-        background:#007100;
-      }
-      button.edit:hover {
-        background:#0F0;
-      }
-      button.run {
-        position:absolute;
-        right:87px;
-        width:30px;
-        height:30px;
-        background:#000071;
-      }
-      button.run:hover {
-        background:#00F;
-      }
-      div.fillprogramheader {
-        position:relative;
-        top:0px;
-        left:0px;
-        width:350px;
-        height:25px;
-        background:#EEE;
-      }
-      div.programheader {
-        font-size:20px;
-        font-family:'Lato';
-        position:fixed;
-        top:25px;
-        left:0px;
-        width:350px;
-        height:45px;
-        border-bottom:1px solid #888;
-        text-align:center;
-        background:#EEE;
-      }
-      div.filleditorheader {
-        position:relative;
-        top:0px;
-        left:0px;
-        width:100%;
-        height:25px;
-        background:#EEE;
-      }
-      div.editorheader {
-        font-size:20px;
-        font-family:'Lato';
-        position:relative;
-        top:0px;
-        left:0px;
-        width:100%;
-        height:45px;
-        border-bottom:1px solid #888;
-        text-align:center;
-        background:#EEE;
-      }
-      div.fillconsoleheader {
-        position:relative;
-        top:0px;
-        left:0px;
-        width:100%;
-        height:25px;
-        background:#EEE;
-      }
-      div.consoleheader {
-        font-size:20px;
-        font-family:'Lato';
-        position:relative;
-        top:0px;
-        left:0px;
-        width:100%;
-        height:45px;
-        border-bottom:1px solid #888;
-        text-align:center;
-        background:#EEE;
-      }
-      div#log {
-        position:absolute;
-        top:70px;
-        bottom:0;
-        width:100%;
-        overflow:auto;
-      }
-      div#editor_wrap {
-        top:0px;
-        bottom:50%;
-        width:100%;
-        background:#FFF;
-      }
-      div#editor {
-        z-index:0;
-        top:71px;
-        bottom:0px;
-        left:0px;
-        right:0px;
-      }
-      div#console {
-        border-top:1px solid #888;
-        top:50%;
-        bottom:0px;
-        width:100%;
-        background:#FFF;
-      }
-      button#clearconsole, button#cleareditor {
-        position:absolute;
-        top:-16px;
-        right:9px;
-        width:30px;
-        height:30px;
-        background:#710000;
-      }
-      button#newebutton {
-        position:absolute;
-        top:-16px;
-        right:48px;
-        width:30px;
-        height:30px;
-        background:#007100;
-      }
-      button#savebutton {
-        position:absolute;
-        top:-16px;
-        right:48px;
-        width:30px;
-        height:30px;
-        background:#007100;
-      }
-      button#cancelbutton {
-        position:absolute;
-        top:-16px;
-        right:9px;
-        width:30px;
-        height:30px;
-        background:#710000;
-      }
-      button#runbutton {
-        position:absolute;
-        top:-16px;
-        right:87px;
-        width:30px;
-        height:30px;
-        background:#000071;
-      }
-      button#donebutton {
-        position:absolute;
-        top:-16px;
-        right:9px;
-        width:30px;
-        height:30px;
-        background:#007100;
-      }
-      button#clearconsole:hover, button#cleareditor:hover, button#cancelbutton:hover {
-        background:#F00;
-      }
-      button#newebutton:hover, button#savebutton:hover, button#donebutton:hover {
-        background:#0F0;
-      }
-      button#runbutton:hover {
-        background:#00F;
-      }
-      div.shader {
-        position:fixed;
-        top:0px;
-        left:0px;
-        right:0px;
-        bottom:0px;
-        background:rgba(100, 100, 100, 0.7);
-      }
-      div.shader_white {
-        position:fixed;
-        top:0px;
-        left:0px;
-        right:0px;
-        bottom:0px;
-        background:rgba(100, 100, 100, 0.7);
-        background:#EEE;
-        z-index:500;
-      }
-      div.confirmation {
-        font-size:20px;
-        position:absolute;
-        width:200px;
-        height:200px;
-        top:50%;
-        left:50%;
-        margin-top:-100px;
-        margin-left:-100px;
-        text-align:center;
-        box-shadow:0px 0px 2px 2px #444;
-        background:#FFF;
-      }
-      div.login {
-        font-size:20px;
-        position:absolute;
-        width:200px;
-        height:200px;
-        top:50%;
-        left:50%;
-        margin-top:-100px;
-        margin-left:-100px;
-        text-align:center;
-        box-shadow:0px 0px 2px 2px #444;
-        background:#FFF;
-        z-index:1000;
-      }
-      button#confirm {
-        position:absolute;
-        top:150px;
-        left:20px;
-        width:30px;
-        height:30px;
-        background:#007100;
-      }
-      button#confirm:hover {
-        background:#0F0;
-      }
-      button#deny {
-        position:absolute;
-        top:150px;
-        right:20px;
-        width:30px;
-        height:30px;
-      }
-      button#deny:hover {
-        background:#F00;
-      }
-      button#login {
-        position:absolute;
-        top:150px;
-        right:20px;
-        width:30px;
-        height:30px;
-        background:#007100;
-      }
-      button#login:hover {
-        background:#0F0;
-      }
-      span.confirmtext {
-        position:relative;
-        top:65px;
-      }
-      span.logintext {
-        position:relative;
-        top:65px;
-      }
-	    div#programs {
-	      position:absolute;
-	      top:71px;
-	      left:0px;
-	      right:0px;
-	      bottom:0px;
-	      overflow:auto;
-	    }
-	    input.login {
-	      width:150px;
-	      position:relative;
-	      top:80px;
-	    }
-	    span#sync {
-	      position:absolute;
-	      left: 10px;
-	      color:#999;
-	    }
-    </style>
   </head>
   <body>
-    <div class="blockish" id="big_wrapper">
-      <div class="shader_white"></div>
-      <div class="login">
-        <span class="logintext">Username?</span>
-        <input class="field login" />
-        <button id="login" class="field" title="Login">L</button>
+    <div class='blockish' id='big_wrapper'>
+      <div class='shader_white'></div>
+      <div class='login'>
+        <span class='logintext'>Username?</span>
+        <input class='field login' />
+        <button id='login' class='field' title='Login'>L</button>
       </div>
-      <div class="blockish" id="left_wrap">
-        <div id="program_list">
-          <div class="fillprogramheader"></div>
-          <div class="programheader">Programs</div>
-          <div id="programs"></div>
+      <div class='blockish' id='left_wrap'>
+        <div id='program_list'>
+          <div class='fillprogramheader'></div>
+          <div class='programheader'>Programs</div>
+          <div id='programs'></div>
         </div>
       </div>
-      <div class="blockish" id="right_wrap">
-        <div class="blockish" id="editor_wrap">
-          <div class="filleditorheader"></div>
-          <div class="editorheader">
-            <span id="sync"></span>
-            <span id="editortitle">Editor</span>
-            <span class="init_hidden" id = "editor_new_name">Name: <input id="new_ebutton_name" class="field"/></span>
-            <button id="donebutton" class="field init_hidden" title="Done">D</button>
-            <button id="savebutton" class="field init_hidden" title="Save">S</button>
-            <button id="cancelbutton" class="field init_hidden" title="Cancel">C</button>
-            <button id="runbutton" class="field" title="Run">R</button>
-            <button id="newebutton" class="field" title="New button">N</button>
-            <button id="cleareditor" class="field" title="Clear">C</button>
+      <div class='blockish' id='right_wrap'>
+        <div class='blockish' id='editor_wrap'>
+          <div class='filleditorheader'></div>
+          <div class='editorheader'>
+            <span id='sync'></span>
+            <span id='editortitle'>Editor</span>
+            <span class='init_hidden' id = 'editor_new_name'>Name: <input id='new_ebutton_name' class='field'/></span>
+            <button id='donebutton' class='field init_hidden' title='Done'>D</button>
+            <button id='savebutton' class='field init_hidden' title='Save'>S</button>
+            <button id='cancelbutton' class='field init_hidden' title='Cancel'>C</button>
+            <button id='runbutton' class='field' title='Run'>R</button>
+            <button id='newebutton' class='field' title='New button'>N</button>
+            <button id='cleareditor' class='field' title='Clear'>C</button>
           </div>
-          <div id="editor" class="blockish"></div>
+          <div id='editor' class='blockish'></div>
         </div>
-        <div class="blockish" id="console">
-          <div class="fillconsoleheader"></div>
-          <div class="consoleheader">
+        <div class='blockish' id='console'>
+          <div class='fillconsoleheader'></div>
+          <div class='consoleheader'>
             Console
-            <button id="clearconsole" class="field" title="Clear">C</button>
+            <button id='clearconsole' class='field' title='Clear'>C</button>
           </div>
-          <div class="monospace" id="log"></div>
+          <div class='monospace' id='log'></div>
         </div>
       </div>
-      <div class="shader init_hidden"></div>
-      <div class="confirmation init_hidden">
-        <span class="confirmtext">Really?</span>
-        <button id="confirm" class="field" title="Yes">Y</button>
-        <button id="deny" class="field" title="No">N</button>
+      <div class='shader init_hidden'></div>
+      <div class='confirmation init_hidden'>
+        <span class='confirmtext'>Really?</span>
+        <button id='confirm' class='field' title='Yes'>Y</button>
+        <button id='deny' class='field' title='No'>N</button>
       </div>
     </div>
   </body>
