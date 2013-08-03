@@ -2,29 +2,27 @@ body,html {
   background:#EEE;
   overflow:hidden;
   font-family:Lato, Verdana, Arial, sans-serif;
-  margin:0;
-  padding:0;
+  margin:0px;
+  padding:0px;
 }
 div.blockish {
   position:absolute;
 }
 div.blockish#left_wrap {
-  left:0;
-  top:0;
-  bottom:0;
+  left:0px;
+  top:0px;
+  bottom:0px;
   width:350px;
   box-shadow:1px 0 1px #888 inset;
-}
-div.blockish#right_wrap {
-  top:0;
-  bottom:0;
-  right:0;
-  left:350px;
-  border-left:1px solid #888;
+  background:#FFF;
   overflow:auto;
 }
-div#left_wrap {
-  background:#FFF;
+div.blockish#right_wrap {
+  top:0px;
+  bottom:0px;
+  right:0px;
+  left:350px;
+  border-left:1px solid #888;
   overflow:auto;
 }
 div.program {
@@ -81,20 +79,20 @@ div#program_list {
   left:0px;
   right:0px;
   top:0px;
-  bottom:0;
+  bottom:0px;
 }
 div.blockish#big_wrapper {
-  top:0;
-  bottom:0;
-  right:0;
-  left:0;
+  top:0px;
+  bottom:0px;
+  right:0px;
+  left:0px;
   overflow:auto;
 }
 div.console {
-  top:0;
-  bottom:0;
-  right:0;
-  left:0;
+  top:0px;
+  bottom:0px;
+  right:0px;
+  left:0px;
   position:absolute;
   padding:5px;
 }
@@ -111,9 +109,7 @@ button.delete {
   right:9px;
   width:30px;
   height:30px;
-}
-button.delete:hover {
-  background:#F00;
+  background:#710000;
 }
 button.edit {
   position:absolute;
@@ -122,18 +118,12 @@ button.edit {
   height:30px;
   background:#007100;
 }
-button.edit:hover {
-  background:#0F0;
-}
 button.run {
   position:absolute;
   right:87px;
   width:30px;
   height:30px;
   background:#000071;
-}
-button.run:hover {
-  background:#00F;
 }
 div.fillprogramheader {
   position:relative;
@@ -198,7 +188,7 @@ div.consoleheader {
 div#log {
   position:absolute;
   top:70px;
-  bottom:0;
+  bottom:0px;
   width:100%;
   overflow:auto;
 }
@@ -222,7 +212,7 @@ div#console {
   width:100%;
   background:#FFF;
 }
-button#clearconsole, button#cleareditor {
+button#clearconsole, button#cleareditor, button#cancelbutton {
   position:absolute;
   top:-16px;
   right:9px;
@@ -230,29 +220,13 @@ button#clearconsole, button#cleareditor {
   height:30px;
   background:#710000;
 }
-button#newebutton {
+button#newebutton, button#savebutton {
   position:absolute;
   top:-16px;
   right:48px;
   width:30px;
   height:30px;
   background:#007100;
-}
-button#savebutton {
-  position:absolute;
-  top:-16px;
-  right:48px;
-  width:30px;
-  height:30px;
-  background:#007100;
-}
-button#cancelbutton {
-  position:absolute;
-  top:-16px;
-  right:9px;
-  width:30px;
-  height:30px;
-  background:#710000;
 }
 button#runbutton {
   position:absolute;
@@ -270,13 +244,13 @@ button#donebutton {
   height:30px;
   background:#007100;
 }
-button#clearconsole:hover, button#cleareditor:hover, button#cancelbutton:hover {
+button.delete:hover, button#clearconsole:hover, button#cleareditor:hover, button#cancelbutton:hover, button#deny:hover {
   background:#F00;
 }
-button#newebutton:hover, button#savebutton:hover, button#donebutton:hover {
+button.edit:hover, button#newebutton:hover, button#savebutton:hover, button#donebutton:hover, button#confirm:hover, button#login:hover {
   background:#0F0;
 }
-button#runbutton:hover {
+button.run:hover, button#runbutton:hover {
   background:#00F;
 }
 div.shader {
@@ -332,18 +306,12 @@ button#confirm {
   height:30px;
   background:#007100;
 }
-button#confirm:hover {
-  background:#0F0;
-}
 button#deny {
   position:absolute;
   top:150px;
   right:20px;
   width:30px;
   height:30px;
-}
-button#deny:hover {
-  background:#F00;
 }
 button#login {
   position:absolute;
@@ -353,14 +321,7 @@ button#login {
   height:30px;
   background:#007100;
 }
-button#login:hover {
-  background:#0F0;
-}
-span.confirmtext {
-  position:relative;
-  top:65px;
-}
-span.logintext {
+span.confirmtext, span.logintext {
   position:relative;
   top:65px;
 }
